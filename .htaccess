@@ -1,0 +1,6 @@
+RewriteEngine On
+RewriteRule ^sort/?$ ./sort.php [L]
+RewriteRule ^favorites/?$ ./favorites.php [L]
+RewriteRule ^search/?$ ./search.php [L]
+RewriteRule ^([0-9]+)/([0-9]+)/?$ ./month.php?y=$1&m=$2
+RewriteRule ^([0-9]+)/([0-9]+)/([0-9]+)/?$ ./day.php?y=$1&m=$2&d=$3
