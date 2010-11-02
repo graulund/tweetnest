@@ -74,7 +74,7 @@
 				}
 				$d     = implode("\n", array($ds[0], rtrim($imgd, "\n"), $ds[1]));
 			}
-			return $d;
+			return array($d, $tweet);
 		}
 	}
 	
