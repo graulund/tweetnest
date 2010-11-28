@@ -74,7 +74,7 @@
 	// Check for cURL
 	if(!extension_loaded("curl")){
 	    $prefix = (PHP_SHLIB_SUFFIX === "dll") ? "php_" : "";
-	    if(!@dl($prefix . "curl." . PHP_SHLIB_SUFFIX)){
+	    if(!function_exists("dl") || !@dl($prefix . "curl." . PHP_SHLIB_SUFFIX)){
 	        trigger_error("Unable to load the PHP cURL extension.", E_USER_ERROR);
 	        exit;
 	    }
