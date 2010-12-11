@@ -60,9 +60,9 @@
 	
 	function configSetting($cf, $setting, $value){
 		if($value === ""){ return $cf; } // Empty
-		$empty = is_bool($value) ? "(true|false)" : "\"\"";
-		$val   = is_bool($value) ? ($value ? "true" : "false") : "\"" . preg_replace('/([\\"])/', "\\$1", $value) . "\"";
-		return preg_replace("/\"" . preg_quote($setting, "/") . "\"(\s*)=>(\s*)" . $empty . "/", "\"" . $setting . "\"$1=>$2" . $val, $cf);
+		$empty = is_bool($value) ? "(true|false)" : "''";
+		$val   = is_bool($value) ? ($value ? "true" : "false") : "'" . preg_replace("/([\\'])/", '\\\$1', $value) . "'";
+		return preg_replace("/'" . preg_quote($setting, "/") . "'(\s*)=>(\s*)" . $empty . "/", "'" . $setting . "'$1=>$2" . $val, $cf);
 	}
 	
 	$e       = array();
