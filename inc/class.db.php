@@ -95,11 +95,11 @@
 		}
 		
 		public function clientVersion(){
-			return $this->mysqli ? $this->res->get_client_info() : mysql_get_client_info();
+			return $this->_getMySQLVersion($this->mysqli ? $this->res->get_client_info() : mysql_get_client_info());
 		}
 		
 		public function serverVersion(){
-			return $this->mysqli ? $this->res->server_info : mysql_get_server_info();
+			return $this->_getMySQLVersion($this->mysqli ? $this->res->server_info : mysql_get_server_info());
 		}
 		
 		public function reconnect(){
@@ -112,5 +112,12 @@
 			$this->res  = null;
 			$this->conn = false;
 			$this->connect();
+		}
+		
+		private function _getMySQLVersion($versionstring){
+			if(preg_match("/^mysqlnd ([0-9\.]+)/", $cv, $matches)){
+				return $matches[1];
+			}
+			return $versionstring;
 		}
 	}
