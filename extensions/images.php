@@ -44,6 +44,14 @@
 						if($domain == "twitvid.com"){
 							$imgs[$link] = "http://images.twitvid.com/" . $imgid . ".jpg";
 						}
+						if($domain == "instagr.am"){
+							$html = (string) getURL($link);
+							preg_match('/<meta property="og:image" content="[^"]+"\/>/i', $html, $matches);
+							if (isset($matches[0]))
+							{
+								$imgs[$link] = substr($matches[0], 35, -3);
+							}			
+						}
 					}
 				}
 			}
@@ -74,7 +82,7 @@
 				}
 				$d     = implode("\n", array($ds[0], rtrim($imgd, "\n"), $ds[1]));
 			}
-			return $d;
+			return array($d, $tweet);
 		}
 	}
 	

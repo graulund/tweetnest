@@ -136,7 +136,7 @@
 				(($tweetplace && @$tweetplace->full_name) ? "\t\t<span class=\"place\">from <a href=\"http://maps.google.com/?q=" . urlencode($tweetplace->full_name) . "\">" . s($tweetplace->full_name) . "</a></span>" : "") .
 				$t . "\t</p>\n" . $t . "</div>\n";
 		$dd = hook("displayTweet", array($d, $tweet));
-		if(!empty($dd)){ $d = $dd; }
+		if(!empty($dd)){ $d = $dd[0]; }
 		return  $d;
 	}
 	
