@@ -38,6 +38,9 @@
 						if($domain == "img.ly"){
 							$imgs[$link] = "http://img.ly/show/thumb/" . $imgid;
 						}
+						if($domain == "pict.mobi"){
+							$imgs[$link] = "http://pict.mobi/show/thumb/" . $imgid;
+						}
 						if($domain == "imgur.com"){
 							$imgs[$link] = "http://i.imgur.com/" . $imgid . "s.jpg";
 						}
@@ -47,8 +50,7 @@
 						if($domain == "instagr.am"){
 							$html = (string) getURL($link);
 							preg_match('/<meta property="og:image" content="[^"]+"\/>/i', $html, $matches);
-							if (isset($matches[0]))
-							{
+							if(isset($matches[0])){
 								$imgs[$link] = substr($matches[0], 35, -3);
 							}			
 						}
