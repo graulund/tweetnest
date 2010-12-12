@@ -71,7 +71,7 @@
 	$post    = (strtoupper($_SERVER['REQUEST_METHOD']) == "POST");
 	
 	// Get the full path
-	$fPath = explode(DIRECTORY_SEPERATOR, rtrim(__FILE__, DIRECTORY_SEPERATOR));
+	$fPath = explode(DIRECTORY_SEPARATOR, rtrim(__FILE__, DIRECTORY_SEPARATOR));
 	array_pop($fPath); // Remove setup.php
 	$fPath = implode($fPath, "/");
 	
