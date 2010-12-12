@@ -113,7 +113,7 @@
 					}
 					$t[$key] = $val;
 				} elseif($k == "user"){
-					$t['userid'] = (int) $v->id;
+					$t['userid'] = (string) $v->id_str;
 				} elseif($k == "retweeted_status"){
 					$rt = array(); $rte = array();
 					foreach(get_object_vars($v) as $kk => $vv){
@@ -129,7 +129,7 @@
 							}
 							$rt[$kkey] = $vval;
 						} elseif($kk == "user"){
-							$rt['userid']     = (string) $vv->id;
+							$rt['userid']     = (string) $vv->id_str;
 							$rt['screenname'] = (string) $vv->screen_name;
 						} else {
 							$rte[$kk] = $vv;

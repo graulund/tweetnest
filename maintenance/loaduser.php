@@ -27,11 +27,11 @@
 		);
 		echo l("Checking...\n");
 		$db->query("DELETE FROM `".DTP."tweetusers` WHERE `userid` = '0'"); // Getting rid of empty users created in error
-		$q = $db->query("SELECT * FROM `".DTP."tweetusers` WHERE `userid` = '" . $db->s($data->id) . "' LIMIT 1");
+		$q = $db->query("SELECT * FROM `".DTP."tweetusers` WHERE `userid` = '" . $db->s($data->id_str) . "' LIMIT 1");
 		if($db->numRows($q) <= 0){
-			$iq = "INSERT INTO `".DTP."tweetusers` (`userid`, `screenname`, `realname`, `location`, `description`, `profileimage`, `url`, `extra`, `enabled`) VALUES ('" . $db->s($data->id) . "', '" . $db->s($data->screen_name) . "', '" . $db->s($data->name) . "', '" . $db->s($data->location) . "', '" . $db->s($data->description) . "', '" . $db->s($data->profile_image_url) . "', '" . $db->s($data->url) . "', '" . $db->s(serialize($extra)) . "', '1');";
+			$iq = "INSERT INTO `".DTP."tweetusers` (`userid`, `screenname`, `realname`, `location`, `description`, `profileimage`, `url`, `extra`, `enabled`) VALUES ('" . $db->s($data->id_str) . "', '" . $db->s($data->screen_name) . "', '" . $db->s($data->name) . "', '" . $db->s($data->location) . "', '" . $db->s($data->description) . "', '" . $db->s($data->profile_image_url) . "', '" . $db->s($data->url) . "', '" . $db->s(serialize($extra)) . "', '1');";
 		} else {
-			$iq = "UPDATE `".DTP."tweetusers` SET `screenname` = '" . $db->s($data->screen_name) . "', `realname` = '" . $db->s($data->name) . "', `location` = '" . $db->s($data->location) . "', `description` = '" . $db->s($data->description) . "', `profileimage` = '" . $db->s($data->profile_image_url) . "', `url` = '" . $db->s($data->url) . "', `extra` = '" . $db->s(serialize($extra)) . "' WHERE `userid` = '" . $db->s($data->id) . "' LIMIT 1";
+			$iq = "UPDATE `".DTP."tweetusers` SET `screenname` = '" . $db->s($data->screen_name) . "', `realname` = '" . $db->s($data->name) . "', `location` = '" . $db->s($data->location) . "', `description` = '" . $db->s($data->description) . "', `profileimage` = '" . $db->s($data->profile_image_url) . "', `url` = '" . $db->s($data->url) . "', `extra` = '" . $db->s(serialize($extra)) . "' WHERE `userid` = '" . $db->s($data->id_str) . "' LIMIT 1";
 		}
 		echo l("Updating...\n");
 		$q = $db->query($iq);
