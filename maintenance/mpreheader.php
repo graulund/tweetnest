@@ -4,7 +4,8 @@
 	
 	$web  = !empty($_SERVER['HTTP_HOST']);
 	global $web;
-	$dir  = preg_replace("/\/[^\/]*$/", "", __FILE__);
+	$ds   = preg_quote(DIRECTORY_SEPERATOR, "/");
+	$dir  = str_replace(DIRECTORY_SEPERATOR, "/", preg_replace("/" . $ds . "[^" . $ds . "]*$/", "", __FILE__));
 	require $dir . "/../inc/preheader.php";
 	date_default_timezone_set($config['timezone']);
 	$path = rtrim($config['path'], "/");
