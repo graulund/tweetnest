@@ -62,7 +62,7 @@
 			$uid        = $pd['value'];
 			$screenname = $twitterApi->getScreenName($pd['value']);
 		}
-		$tiQ = $db->query("SELECT `tweetid` FROM `".DTP."tweets` WHERE `userid` = '" . $db->s($uid) . "' ORDER BY `tweetid` DESC LIMIT 1");
+		$tiQ = $db->query("SELECT `tweetid` FROM `".DTP."tweets` WHERE `userid` = '" . $db->s($uid) . "' ORDER BY `id` DESC LIMIT 1");
 		if($db->numRows($tiQ) > 0){
 			$ti      = $db->fetch($tiQ);
 			$sinceID = $ti['tweetid'];
@@ -72,10 +72,13 @@
 		
 		// Find total number of tweets
 		$total = totalTweets($p);
-		if($total > 3200){ $total = 3200; } // Due to current Twitter bug
+		if($total > 3200){ $total = 3200; } // Due to current Twitter limitation
 		$pages = ceil($total / $maxCount);
 		
 		echo l("Total tweets: <strong>" . $total . "</strong>, Pages: <strong>" . $pages . "</strong>\n");
+		if($sinceID){
+			echo l("Newest tweet I've got: <strong>" . $sinceID . "</strong>\n");
+		}
 		
 		// Retrieve tweets
 		for($i = 0; $i < $pages; $i++){
