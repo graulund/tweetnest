@@ -31,10 +31,6 @@
 				case "mysql":
 					// Check for MySQLi
 					$this->mysqli = extension_loaded("mysqli");
-					if(!$this->mysqli){
-						$prefix = (PHP_SHLIB_SUFFIX === "dll") ? "php_" : "";
-						$this->mysqli = extension_loaded("mysqli");
-					}
 					try {
 						$this->on   = true;
 						$this->res  = $this->mysqli ?
