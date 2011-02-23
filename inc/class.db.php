@@ -109,7 +109,7 @@
 		}
 		
 		private function _getMySQLVersion($versionstring){
-			if(preg_match("/^mysqlnd ([0-9\.]+)/", $cv, $matches)){
+			if(preg_match("/^mysqlnd ([0-9\.]+)/", $versionstring, $matches)){
 				return $matches[1];
 			}
 			return $versionstring;
