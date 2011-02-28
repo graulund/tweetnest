@@ -94,7 +94,7 @@
 	if($post){
 		$log[] = "Settings being submitted!";
 		$log[] = "PHP version: " . PHP_VERSION;
-		if(!empty($_POST['twitter_screenname']) && !empty($_POST['tz']) && !empty($_POST['path']) && !empty($_POST['db_hostname']) && !empty($_POST['db_username']) && !empty($_POST['db_password']) && !empty($_POST['db_database']) && !empty($_POST['db_table_prefix'])){ // Required fields
+		if(!empty($_POST['twitter_screenname']) && !empty($_POST['tz']) && !empty($_POST['path']) && !empty($_POST['db_hostname']) && !empty($_POST['db_username']) && !empty($_POST['db_database'])){ // Required fields
 			$log[] = "All required fields filled in.";
 			if(preg_match("/^[a-zA-Z0-9_]+$/", $_POST['twitter_screenname']) && strlen($_POST['twitter_screenname']) <= 15){
 				$log[] = "Valid Twitter screen name.";
@@ -106,7 +106,7 @@
 			} else {
 				$e[] = "Invalid time zone.";
 			}
-			if(preg_match("/^[a-zA-Z0-9_]+$/", $_POST['db_table_prefix'])){
+			if(empty($_POST['db_table_prefix']) || preg_match("/^[a-zA-Z0-9_]+$/", $_POST['db_table_prefix'])){
 				$log[] = "Valid table name prefix.";
 			} else {
 				$e[] = "Invalid table name prefix. You can only use letters, numbers and the _ character.";
