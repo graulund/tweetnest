@@ -25,7 +25,7 @@
 						if($domain == "twitpic.com"){
 							$imgs[$link] = "http://twitpic.com/show/thumb/" . $imgid;
 						}
-						if($domain == "yfrog.com"){
+						if($domain == "yfrog.com" || $domain == "yfrog.us"){
 							$imgs[$link] = "http://yfrog.com/" . $imgid . ".th.jpg";
 						}
 						if($domain == "tweetphoto.com" || $domain == "pic.gd" || $domain == "plixi.com"){
