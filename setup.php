@@ -609,7 +609,7 @@ INSTALL LOG: <?php var_dump($log); ?>
 			</div>
 			<div class="input lastinput">
 				<label for="db_table_prefix">Table name prefix</label>
-				<div class="field required"><input type="text" class="text" name="db_table_prefix" id="db_table_prefix" maxlength="10" value="<?php echo $_POST['db_table_prefix'] ? s($_POST['db_table_prefix']) : s("tn_"); ?>" /></div>
+				<div class="field required"><input type="text" class="text" name="db_table_prefix" id="db_table_prefix" maxlength="10" value="<?php echo !empty($_POST) ? s($_POST['db_table_prefix']) : s("tn_"); ?>" /></div>
 				<div class="what">The Tweet Archive set up page (that&#8217;s this one!) generates three different tables, and to prevent the names clashing with some already there, here you can type a character sequence prefixed to the name of both tables. Something like <strong>&#8220;ta_&#8221;</strong> or <strong>&#8220;tn_&#8221;</strong> is good.</div>
 			</div>
 			
