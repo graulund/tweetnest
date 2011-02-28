@@ -8,7 +8,7 @@
 	mb_language("uni");
 	mb_internal_encoding("UTF-8");
 	
-	define("TWEET_NEST", "0.8.1"); // Version number
+	define("TWEET_NEST", "0.8.2"); // Version number
 	
 	require "config.php";
 	if(empty($config['twitter_screenname'])){ header("Location: ./setup.php"); exit; }
@@ -47,7 +47,7 @@
 	$highlightedMonths = array();
 	$filterMode        = "search";
 	$home              = false;
-	$jQueryVersion     = "1.4.2";
+	$jQueryVersion     = "1.5.1";
 	
 	// Getting database time offset
 	$dbtQ = $db->query("SELECT TIME_FORMAT(NOW() - UTC_TIMESTAMP(), '%H%i') AS `diff`");
@@ -60,8 +60,8 @@
 	define("DB_OFFSET", $dbOffset);
 	
 	// String manipulation functions
-	function s($str){ return htmlspecialchars($str, ENT_NOQUOTES); } // Shorthand
-	function x($str, $attr = NULL){ return p(s($str), $attr); } // Shorthand
+	function s($str, $flags = ENT_COMPAT){ return htmlspecialchars($str, $flags); } // Shorthand
+	function x($str, $attr = NULL){ return p(s($str, ENT_NOQUOTES), $attr); } // Shorthand
 	function p($str, $attr = NULL, $force = false){ global $config; return ($config['smartypants'] || $force) ? SmartyPants($str, $attr) : $str; }
 	
 	// Numeric manipulation functions

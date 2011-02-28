@@ -35,7 +35,7 @@
 			$qs   = implode("&", $qsa);
 			$cn   = ($filterMode == "favorites") ? "fav" : "search";
 			$res  = ($filterMode == "favorites") ? "favorites" : "results";
-			$s   .= $y . "<li class=\"" . $cn . "\"><a href=\"" . ($url[0] . ($qs ? "?" . $qs : "")) . "\"><span class=\"m\">All " . $res . "</span></a></li>\n";
+			$s   .= $y . "<li class=\"" . $cn . "\"><a href=\"" . s($url[0] . ($qs ? "?" . $qs : "")) . "\"><span class=\"m\">All " . $res . "</span></a></li>\n";
 		}
 		foreach($months as $m){
 			$c  = ""; $cc = 0;
@@ -54,7 +54,7 @@
 			}
 			$c  = trim($c);
 			$s .= $y . "<li" . ($c ? " class=\"" . $c . "\"" : "") . ">" .
-			"<a href=\"" . ($cc > 0 ? $pURL : $path . "/" . s($m['y']) . "/" . s(pad($m['m']))) . "\">" .
+			"<a href=\"" . ($cc > 0 ? s($pURL) : $path . "/" . s($m['y']) . "/" . s(pad($m['m']))) . "\">" .
 			"<span class=\"m\">" . date("F Y", mktime(1,0,0,$m['m'],1,$m['y'])) . "</span>" .
 			"<span class=\"n\"> " . number_format($m['c']) . ($cc > 0 ? " <strong>(" . number_format($cc) . ")</strong>" : "") . 
 			"</span><span class=\"p\" style=\"width:" . round((($m['c']/$max)*100), 2) . "%\"></span></a></li>\n";
@@ -127,7 +127,7 @@
 				($tweet['favorite'] ? $t . "\t<div class=\"fav\" title=\"A personal favorite\"><span>(A personal favorite)</span></div>\n" : "") .
 				$t . "\t<p class=\"text\">" . ($rt ? "<a class=\"rt\" href=\"http://twitter.com/" . $retweet['screenname'] . "\"><strong>" . $retweet['screenname'] . "</strong></a> " : "") . 
 				nl2br(p(highlightQuery(linkifyTweet(
-					s(stupefyRaw($rt ? $twitterApi->entityDecode($retweet['text']) : $tweet['text']))
+					s(stupefyRaw($rt ? $twitterApi->entityDecode($retweet['text']) : $tweet['text']), ENT_NOQUOTES)
 				), $tweet), 3)) . "</p>\n" . 
 				$t . "\t<p class=\"meta\">\n" . $t . "\t\t<a href=\"http://twitter.com/" . s($rt ? $retweet['screenname'] : $tweet['screenname']) . "/statuses/" . s($rt ? $retweet['tweetid'] : $tweet['tweetid']) . "\" class=\"permalink\">" . date("g:i A, M jS, Y", ($rt ? $retweet['time'] : $tweet['time'])) . "</a>\n" . 
 				$t . "\t\t<span class=\"via\">via " . ($rt ? $retweet['source'] : $tweet['source']) . "</span>\n" .
