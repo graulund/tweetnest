@@ -123,12 +123,24 @@
 		$rt = (array_key_exists("rt", $tweetextra) && !empty($tweetextra['rt']));
 		$t  = str_repeat("\t", $tabs);
 		if($rt){ $retweet = $tweetextra['rt']; }
+		
+		// Entities
+		$htmlcontent = s(stupefyRaw($rt ? $twitterApi->entityDecode($retweet['text']) : $tweet['text']), ENT_NOQUOTES);
+		$entities    = ($rt ? $tweetextra['rt']['extra']['entities'] : $tweetextra['entities']);
+		
+		if(areEntitiesEmpty($entities)){
+			$htmlcontent = linkifyTweet($htmlcontent);
+		} else {
+			$htmlcontent = linkifyTweet(entitifyTweet($htmlcontent, $entities), true);
+		}
+		
 		$d  =   $t . "<div id=\"tweet-" . s($tweet['tweetid']) . "\" class=\"tweet" . (($tweet['type'] == 1) ? " reply" : "") . (($tweet['type'] == 2) ? " retweet" : "") . "\">\n" . 
 				($tweet['favorite'] ? $t . "\t<div class=\"fav\" title=\"A personal favorite\"><span>(A personal favorite)</span></div>\n" : "") .
-				$t . "\t<p class=\"text\">" . ($rt ? "<a class=\"rt\" href=\"http://twitter.com/" . $retweet['screenname'] . "\"><strong>" . $retweet['screenname'] . "</strong></a> " : "") . 
-				nl2br(p(highlightQuery(linkifyTweet(
-					s(stupefyRaw($rt ? $twitterApi->entityDecode($retweet['text']) : $tweet['text']), ENT_NOQUOTES)
-				), $tweet), 3)) . "</p>\n" . 
+				$t . "\t<p class=\"text\">" . 
+				($rt ? "<a class=\"rt\" href=\"http://twitter.com/" . $retweet['screenname'] . "\"><strong>" . $retweet['screenname'] . "</strong></a> " : "") . 
+				
+				nl2br(p(highlightQuery($htmlcontent, $tweet), 3)) . "</p>\n" . 
+				
 				$t . "\t<p class=\"meta\">\n" . $t . "\t\t<a href=\"http://twitter.com/" . s($rt ? $retweet['screenname'] : $tweet['screenname']) . "/statuses/" . s($rt ? $retweet['tweetid'] : $tweet['tweetid']) . "\" class=\"permalink\">" . date("g:i A, M jS, Y", ($rt ? $retweet['time'] : $tweet['time'])) . "</a>\n" . 
 				$t . "\t\t<span class=\"via\">via " . ($rt ? $retweet['source'] : $tweet['source']) . "</span>\n" .
 				($rt ? $t . "\t\t<span class=\"rted\">(retweeted on " . date("g:i A, M jS, Y", $tweet['time']) . " <span class=\"via\">via " . $tweet['source'] . "</span>)</span>\n" : "") . 
@@ -364,11 +376,89 @@
 	function _linkifyTweet_hashtag($a, $b){
 		return "<a class=\"hashtag\" href=\"http://twitter.com/search?q=%23" . $a . "\">#" . $a . "</a>";
 	}
-	function linkifyTweet($str){
-		$html = preg_replace("/\b(((https*:\/\/)|www\.).+?)(([!?,.\"\)]+)?(\s|$))/e", "_linkifyTweet_link('$1', '$2', '$3', '$4')", $str);
-		$html = preg_replace("/\B\@([a-zA-Z0-9_]{1,20}(\/\w+)?)/e", "_linkifyTweet_at('$1', '$2')", $html);
-		$html = preg_replace("/\B\#(\w+)/e", "_linkifyTweet_hashtag('$1', '$2')", $html);
+	function linkifyTweet($str, $linksOnly = false){
+		// Look behind (it kinda sucks, no | operator)
+		$lookbehind = '(?<!href=\")(?<!title=\")' .
+				'(?<!href=\"http:\/\/)(?<!href=\"https:\/\/)' .
+				'(?<!title=\"http:\/\/)(?<!title=\"https:\/\/)' .
+				'(?<!data-image=\")(?<!data-image=\"http:\/\/)(?<!data-image=\"https:\/\/)';
+		// Expression
+		$html = preg_replace("/$lookbehind\b(((https?:\/\/)|www\.).+?)(([!?,.\"\)]+)?(\s|$))/e", "_linkifyTweet_link('$1', '$2', '$3', '$4')", $str);
+		if(!$linksOnly){
+			$html = preg_replace("/\B\@([a-zA-Z0-9_]{1,20}(\/\w+)?)/e", "_linkifyTweet_at('$1', '$2')", $html);
+			$html = preg_replace("/\B\#(\pL+)/eu", "_linkifyTweet_hashtag('$1', '$2')", $html);
+		}
 		return $html;
+	}
+	
+	function entitifyTweet($str, $entities, $newwindow = false){
+		if(!$entities){ return $str; }
+		$replacements = array();
+		$tb = $newwindow ? ' target="_blank"' : '';
+		
+		// Mentions
+		foreach($entities->user_mentions as $entity){
+			$replacements[$entity->indices[0]] = array(
+				'end'     => $entity->indices[1],
+				'content' => '<span class="at">@</span><a class="user"' . $tb . ' href="http://twitter.com/' . s($entity->screen_name) . '">' . s($entity->screen_name) . '</a>'
+			);
+		}
+		
+		// Hashtags
+		foreach($entities->hashtags as $entity){
+			$replacements[$entity->indices[0]] = array(
+				'end'     => $entity->indices[1],
+				'content' => '<a class="hashtag" rel="search"' . $tb . ' href="http://twitter.com/search?q=%23' . urlencode($entity->text) . '">#' . s($entity->text) . '</a>'
+			);
+		}
+		
+		// URLs
+		foreach($entities->urls as $entity){
+			$truncated = (!empty($entity->display_url) && mb_substr($entity->display_url, -1) == '…');
+			$replacements[$entity->indices[0]] = array(
+				'end'     => $entity->indices[1], // quittin' rel="nofollow" since this is my own site
+				'content' => '<a class="link" href="' . s($entity->url) . '"' . $tb . 
+							(!empty($entity->expanded_url) && $truncated ? ' title="' . s($entity->expanded_url) . '"' : '') . '>' . 
+							(!empty($entity->display_url) ? $entity->display_url : $entity->url) . '</a>'
+			);
+		}
+		
+		// Media
+		if(isset($entities->media) && is_array($entities->media)){
+			foreach($entities->media as $entity){
+				$truncated = (!empty($entity->display_url) && mb_substr($entity->display_url, -1) == '…');
+				$replacements[$entity->indices[0]] = array(
+					'end'     => $entity->indices[1],
+					'content' => '<a class="media" href="' . s($entity->url) . '"' . $tb . ' data-image="' . s($entity->media_url) . '"' . 
+								(!empty($entity->expanded_url) && $truncated ? ' title="' . s($entity->expanded_url) . '"' : '') . '>' . 
+								(!empty($entity->display_url) ? $entity->display_url : $entity->url) . '</a>'
+				);
+			}
+		}
+		
+		// Putting it all together
+		$out = '';
+		$lastEntityEnded = 0;
+		
+		ksort($replacements);
+		
+		foreach($replacements as $position => $replacement){
+			$out .= mb_substr($str, $lastEntityEnded, $position - $lastEntityEnded);
+			$out .= $replacement['content'];
+			$lastEntityEnded = $replacement['end'];
+		}
+		
+		$out .= mb_substr($str, $lastEntityEnded);
+		return $out;
+	}
+	
+	function areEntitiesEmpty($entities){
+		foreach(get_object_vars($entities) as $property => $value){
+			if(!empty($value)){
+				return false;
+			}
+		}
+		return true;
 	}
 	
 	// Altered "Days in Month" function taken from:

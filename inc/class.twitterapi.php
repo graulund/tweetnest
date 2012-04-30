@@ -15,7 +15,7 @@
 			CURLOPT_SSL_VERIFYPEER => false // Insecurity?
 		);
 		public $dbMap = array(
-			"id"           => "tweetid",
+			"id_str"       => "tweetid",
 			"created_at"   => "time",
 			"text"         => "text",
 			"source"       => "source",
@@ -99,38 +99,35 @@
 		}
 		
 		public function transformTweet($tweet){ // API tweet object -> DB tweet array
-			$t = array(); $e = array(); 
+			$t = array(); $e = array();
 			foreach(get_object_vars($tweet) as $k => $v){
 				if(array_key_exists($k, $this->dbMap)){
 					$key = $this->dbMap[$k];
 					$val = $v;
-					if(in_array($key, array("text", "source"))){
-						$val = (string) $v;
-					} elseif(in_array($key, array("tweetid", "id"))){
-						$val = (string) $v; // Yes, I pass tweet id as string. It's a loooong number and we don't need to calc with it.
+					if(in_array($key, array("text", "source", "tweetid", "id", "id_str"))){
+						$val = (string)$v;
+						// Yes, I pass tweet id as string. It's a loooong number and we don't need to calc with it.
 					} elseif($key == "time"){
 						$val = strtotime($v);
 					}
 					$t[$key] = $val;
 				} elseif($k == "user"){
-					$t['userid'] = (string) $v->id_str;
+					$t['userid'] = (string)$v->id_str;
 				} elseif($k == "retweeted_status"){
 					$rt = array(); $rte = array();
 					foreach(get_object_vars($v) as $kk => $vv){
 						if(array_key_exists($kk, $this->dbMap)){
 							$kkey = $this->dbMap[$kk];
 							$vval = $vv;
-							if(in_array($kkey, array("text", "source"))){
-								$vval = (string) $vv;
-							} elseif(in_array($kkey, array("tweetid", "id"))){
-								$vval = (string) $vv;
+							if(in_array($kkey, array("text", "source", "tweetid", "id", "id_str"))){
+								$vval = (string)$vv;
 							} elseif($kkey == "time"){
 								$vval = strtotime($vv);
 							}
 							$rt[$kkey] = $vval;
 						} elseif($kk == "user"){
-							$rt['userid']     = (string) $vv->id_str;
-							$rt['screenname'] = (string) $vv->screen_name;
+							$rt['userid']     = (string)$vv->id_str;
+							$rt['screenname'] = (string)$vv->screen_name;
 						} else {
 							$rte[$kk] = $vv;
 						}
@@ -151,6 +148,36 @@
 		
 		public function entityDecode($str){
 			return str_replace("&amp;", "&", str_replace("&lt;", "<", str_replace("&gt;", ">", $str)));
+		}
+		
+		// Replace t.co links with full links, for internal use
+		public static function fullLinkTweetText($text, $entities, $mediaUrl = false){
+			if(!$entities){ return $text; }
+			$sources      = property_exists($entities, 'media') ? array_merge($entities->urls, $entities->media) : $entities->urls;
+			$replacements = array();
+			foreach($sources as $entity){
+				if(property_exists($entity, 'expanded_url')){
+					$replacements[$entity->indices[0]] = array(
+						'end'     => $entity->indices[1],
+						'content' => $mediaUrl && $entity->media_url ? $entity->media_url : $entity->expanded_url
+					);
+				}
+			}
+			$out = '';
+			$lastEntityEnded = 0;
+			ksort($replacements);
+			foreach($replacements as $position => $replacement){
+				$out .= mb_substr($text, $lastEntityEnded, $position - $lastEntityEnded);
+				$out .= $replacement['content'];
+				$lastEntityEnded = $replacement['end'];
+			}
+			$out .= mb_substr($text, $lastEntityEnded);
+			return $out;
+		}
+		
+		// Same as above, but prefer media urls
+		public static function mediaLinkTweetText($text, $entities){
+			return self::fullLinkTweetText($text, $entities, true);
 		}
 		
 		public function insertQuery($t){

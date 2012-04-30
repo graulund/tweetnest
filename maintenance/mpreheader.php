@@ -10,6 +10,11 @@
 	date_default_timezone_set($config['timezone']);
 	$path = rtrim($config['path'], "/");
 	
+	// Are we running on 64-bit?
+	if(!defined('IS64BIT')){
+		define('IS64BIT', ((int)"9223372036854775807" > 2147483647));
+	}
+	
 	// Maintenance HTTP password
 	if($web && !empty($config['maintenance_http_password'])){
 		if(!empty($_SERVER['HTTP_AUTHORIZATION'])){
@@ -52,3 +57,4 @@
 		require "mfooter.php";
 		die();
 	}
+	

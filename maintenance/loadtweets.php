@@ -7,15 +7,21 @@
 	
 	require_once "mpreheader.php";
 	$p = "";
-	// The below is not important, so errors surpressed
-	$f = @fopen("loadlog.txt", "a"); @fwrite($f, "Attempted load " . date("r") . "\n"); @fclose($f); 
 	
+	// LOGGING
+	// The below is not important, so errors surpressed
+	$f = @fopen("loadlog.txt", "a"); @fwrite($f, "Attempted load " . date("r") . "\n"); @fclose($f);
+	
+	// Header
 	$pageTitle = "Loading tweets";
 	require "mheader.php";
 	
 	// Identifying user
 	if(!empty($_GET['userid']) && is_numeric($_GET['userid'])){
-		$q = $db->query("SELECT * FROM `".DTP."tweetusers` WHERE `userid` = '" . $db->s($_GET['userid']) . "' LIMIT 1");
+		$q = $db->query(
+			"SELECT * FROM `".DTP."tweetusers` WHERE `userid` = '" . $db->s($_GET['userid']) . 
+			"' LIMIT 1"
+		);
 		if($db->numRows($q) > 0){
 			$p = "user_id=" . preg_replace("/[^0-9]+/", "", $_GET['userid']);
 		} else {
@@ -23,7 +29,10 @@
 		}
 	} else {
 		if(!empty($_GET['screenname'])){
-			$q = $db->query("SELECT * FROM `".DTP."tweetusers` WHERE `screenname` = '" . $db->s($_GET['screenname']) . "' LIMIT 1");
+			$q = $db->query(
+				"SELECT * FROM `".DTP."tweetusers` WHERE `screenname` = '" . $db->s($_GET['screenname']) . 
+				"' LIMIT 1"
+			);
 			if($db->numRows($q) > 0){
 				$p = "screen_name=" . preg_replace("/[^0-9a-zA-Z_-]+/", "", $_GET['screenname']);
 			} else {
@@ -75,31 +84,49 @@
 		if($total > 3200){ $total = 3200; } // Due to current Twitter limitation
 		$pages = ceil($total / $maxCount);
 		
-		echo l("Total tweets: <strong>" . $total . "</strong>, Pages: <strong>" . $pages . "</strong>\n");
+		echo l("Total tweets: <strong>" . $total . "</strong>, Approx. page total: <strong>" . $pages . "</strong>\n");
 		if($sinceID){
 			echo l("Newest tweet I've got: <strong>" . $sinceID . "</strong>\n");
 		}
 		
 		// Retrieve tweets
-		for($i = 0; $i < $pages; $i++){
-			$path = "1/statuses/user_timeline.json?" . $p . "&include_rts=true&count=" . $maxCount . ($sinceID ? "&since_id=" . $sinceID : "") . ($maxID ? "&max_id=" . $maxID : "");
+		do {
+			// Determine path to Twitter timeline resource
+			$path =	"1/statuses/user_timeline.json?" . $p . // <-- user argument
+					"&include_rts=true&include_entities=true&count=" . $maxCount .
+					($sinceID ? "&since_id=" . $sinceID : "") . ($maxID ? "&max_id=" . $maxID : "");
+			// Announce
 			echo l("Retrieving page <strong>#" . ($i+1) . "</strong>: <span class=\"address\">" . ls($path) . "</span>\n");
+			// Get data
 			$data = $twitterApi->query($path);
+			// Drop out on connection error
 			if(is_array($data) && $data[0] === false){ dieout(l(bad("Error: " . $data[1] . "/" . $data[2]))); }
+			
+			// Start parsing
 			echo l("<strong>" . ($data ? count($data) : 0) . "</strong> new tweets on this page\n");
-			if(!$data){ break; } // No more tweets
-			echo l("<ul>");
-			foreach($data as $tweet){
-				echo l("<li>" . $tweet->id_str . " " . $tweet->created_at . "</li>\n");
-				$tweets[] = $twitterApi->transformTweet($tweet);
-				$maxID    = sprintf("%.0F", (float)((float)$tweet->id - 1));
+			if(!empty($data)){
+				echo l("<ul>");
+				foreach($data as $i => $tweet){
+					// Shield against duplicate tweet from max_id
+					if(!IS64BIT && $i == 0 && $maxID == $tweet->id_str){ unset($data[0]); continue; }
+					// List tweet
+					echo l("<li>" . $tweet->id_str . " " . $tweet->created_at . "</li>\n");
+					// Create tweet element and add to list
+					$tweets[] = $twitterApi->transformTweet($tweet);
+					// Determine new max_id
+					$maxID    = $tweet->id_str;
+					// Subtracting 1 from max_id to prevent duplicate, but only if we support 64-bit integer handling
+					if(IS64BIT){
+						$maxID = (int)$tweet->id - 1;
+					}
+				}
+				echo l("</ul>");
 			}
-			echo l("</ul>");
-			if(count($data) < ($maxCount - 50)){
+			/*if(count($data) < ($maxCount - 50)){
 				echo l("We've reached last page\n");
 				break;
-			}
-		}
+			}*/
+		} while(!empty($data));
 		
 		if(count($tweets) > 0){
 			// Ascending sort, oldest first
@@ -118,8 +145,8 @@
 				if(is_string($te)){ $te = @unserialize($tweet['extra']); }
 				if(is_array($te)){
 					// Because retweets might get cut off otherwise
-					$text = (array_key_exists("rt", $te) && !empty($te['rt']) && !empty($te['rt']['screenname']) && !empty($te['rt']['text'])) 
-						? "RT @" . $te['rt']['screenname'] . ": " . $te['rt']['text'] 
+					$text = (array_key_exists("rt", $te) && !empty($te['rt']) && !empty($te['rt']['screenname']) && !empty($te['rt']['text']))
+						? "RT @" . $te['rt']['screenname'] . ": " . $te['rt']['text']
 						: $tweet['text'];
 				}
 				$search->index($db->insertID(), $text);
@@ -131,27 +158,35 @@
 		
 		// Checking personal favorites -- scanning all
 		echo l("\n<strong>Syncing favourites...</strong>\n");
-		$pages = ceil($total / $maxCount); // Resetting these
-		$favs  = array();
-		for($i = 0; $i < $pages; $i++){
-			$path = "1/favorites.json?" . $p . "&count=" . $maxCount . ($i > 0 ? "&page=" . $i : "");
+		// Resetting these
+		$favs  = array(); $maxID = 0; $sinceID = 0;
+		do {
+			$path = "1/favorites.json?" . $p . "&count=" . $maxCount . ($maxID ? "&max_id=" . $maxID : "");
 			echo l("Retrieving page <strong>#" . ($i+1) . "</strong>: <span class=\"address\">" . ls($path) . "</span>\n");
 			$data = $twitterApi->query($path);
 			if(is_array($data) && $data[0] === false){ dieout(l(bad("Error: " . $data[1] . "/" . $data[2]))); }
 			echo l("<strong>" . ($data ? count($data) : 0) . "</strong> total favorite tweets on this page\n");
-			if(!$data){ break; } // No more tweets
-			echo l("<ul>");
-			foreach($data as $tweet){
-				if($tweet->user->id_str == $uid){
-					echo l("<li>" . $tweet->id_str . " " . $tweet->created_at . "</li>\n");
-					$favs[] = $tweet->id_str;
+			if(!empty($data)){
+				echo l("<ul>");
+				foreach($data as $tweet){
+					if(!IS64BIT && $i == 0 && $maxID == $tweet->id_str){ unset($data[0]); continue; }
+					if($tweet->user->id_str == $uid){
+						echo l("<li>" . $tweet->id_str . " " . $tweet->created_at . "</li>\n");
+						$favs[] = $maxID = $tweet->id_str;
+						if(IS64BIT){
+							$maxID = (int)$tweet->id - 1;
+						}
+					}
 				}
+				echo l("</ul>");
 			}
-			echo l("</ul>");
-			if(count($data) > 0){ echo l("<strong>" . count($favs) . "</strong> favorite own tweets on this page\n"); }
-			if(count($data) < ($maxCount - 50)){ break; } // We've reached last page
-		}
-		$db->query("UPDATE `".DTP."tweets` SET `favorite` = '0'"); // Blank all favorites
+			echo l("<strong>" . count($favs) . "</strong> favorite own tweets so far\n");
+			//if(count($data) < ($maxCount - 50)){ break; } // We've reached last page
+		} while(!empty($data));
+		
+		// Blank all favorites
+		$db->query("UPDATE `".DTP."tweets` SET `favorite` = '0'");
+		// Insert favorites into DB
 		$db->query("UPDATE `".DTP."tweets` SET `favorite` = '1' WHERE `tweetid` IN ('" . implode("', '", $favs) . "')");
 		echo l(good("Updated favorites!"));
 	}

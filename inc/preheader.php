@@ -8,7 +8,7 @@
 	mb_language("uni");
 	mb_internal_encoding("UTF-8");
 	
-	define("TWEET_NEST", "0.8.2"); // Version number
+	define("TWEET_NEST", "0.8.3"); // Version number
 	
 	require "config.php";
 	if(empty($config['twitter_screenname'])){ header("Location: ./setup.php"); exit; }
