@@ -416,7 +416,7 @@
 		foreach($entities->urls as $entity){
 			$truncated = (!empty($entity->display_url) && mb_substr($entity->display_url, -1) == '…');
 			$replacements[$entity->indices[0]] = array(
-				'end'     => $entity->indices[1], // quittin' rel="nofollow" since this is my own site
+				'end'     => $entity->indices[1], // quittin' rel="nofollow" since this is meant for your own site
 				'content' => '<a class="link" href="' . s($entity->url) . '"' . $tb . 
 							(!empty($entity->expanded_url) && $truncated ? ' title="' . s($entity->expanded_url) . '"' : '') . '>' . 
 							(!empty($entity->display_url) ? $entity->display_url : $entity->url) . '</a>'
