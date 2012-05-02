@@ -453,9 +453,11 @@
 	}
 	
 	function areEntitiesEmpty($entities){
-		foreach(get_object_vars($entities) as $property => $value){
-			if(!empty($value)){
-				return false;
+		if(is_object($entities)){
+			foreach(get_object_vars($entities) as $property => $value){
+				if(!empty($value)){
+					return false;
+				}
 			}
 		}
 		return true;
