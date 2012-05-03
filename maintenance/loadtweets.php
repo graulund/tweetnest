@@ -89,6 +89,8 @@
 			echo l("Newest tweet I've got: <strong>" . $sinceID . "</strong>\n");
 		}
 		
+		$page = 1;
+		
 		// Retrieve tweets
 		do {
 			// Determine path to Twitter timeline resource
@@ -96,7 +98,7 @@
 					"&include_rts=true&include_entities=true&count=" . $maxCount .
 					($sinceID ? "&since_id=" . $sinceID : "") . ($maxID ? "&max_id=" . $maxID : "");
 			// Announce
-			echo l("Retrieving page <strong>#" . ($i+1) . "</strong>: <span class=\"address\">" . ls($path) . "</span>\n");
+			echo l("Retrieving page <strong>#" . $page . "</strong>: <span class=\"address\">" . ls($path) . "</span>\n");
 			// Get data
 			$data = $twitterApi->query($path);
 			// Drop out on connection error
@@ -122,10 +124,7 @@
 				}
 				echo l("</ul>");
 			}
-			/*if(count($data) < ($maxCount - 50)){
-				echo l("We've reached last page\n");
-				break;
-			}*/
+			$page++;
 		} while(!empty($data));
 		
 		if(count($tweets) > 0){
@@ -159,29 +158,30 @@
 		// Checking personal favorites -- scanning all
 		echo l("\n<strong>Syncing favourites...</strong>\n");
 		// Resetting these
-		$favs  = array(); $maxID = 0; $sinceID = 0;
+		$favs  = array(); $maxID = 0; $sinceID = 0; $page = 1;
 		do {
 			$path = "1/favorites.json?" . $p . "&count=" . $maxCount . ($maxID ? "&max_id=" . $maxID : "");
-			echo l("Retrieving page <strong>#" . ($i+1) . "</strong>: <span class=\"address\">" . ls($path) . "</span>\n");
+			echo l("Retrieving page <strong>#" . $page . "</strong>: <span class=\"address\">" . ls($path) . "</span>\n");
 			$data = $twitterApi->query($path);
 			if(is_array($data) && $data[0] === false){ dieout(l(bad("Error: " . $data[1] . "/" . $data[2]))); }
 			echo l("<strong>" . ($data ? count($data) : 0) . "</strong> total favorite tweets on this page\n");
 			if(!empty($data)){
 				echo l("<ul>");
-				foreach($data as $tweet){
+				foreach($data as $i => $tweet){
 					if(!IS64BIT && $i == 0 && $maxID == $tweet->id_str){ unset($data[0]); continue; }
 					if($tweet->user->id_str == $uid){
 						echo l("<li>" . $tweet->id_str . " " . $tweet->created_at . "</li>\n");
-						$favs[] = $maxID = $tweet->id_str;
-						if(IS64BIT){
-							$maxID = (int)$tweet->id - 1;
-						}
+						$favs[] = $tweet->id_str;
+					}
+					$maxID = $tweet->id_str;
+					if(IS64BIT){
+						$maxID = (int)$tweet->id - 1;
 					}
 				}
 				echo l("</ul>");
 			}
 			echo l("<strong>" . count($favs) . "</strong> favorite own tweets so far\n");
-			//if(count($data) < ($maxCount - 50)){ break; } // We've reached last page
+			$page++;
 		} while(!empty($data));
 		
 		// Blank all favorites
