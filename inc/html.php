@@ -386,7 +386,7 @@
 		$html = preg_replace("/$lookbehind\b(((https?:\/\/)|www\.).+?)(([!?,.\"\)]+)?(\s|$))/e", "_linkifyTweet_link('$1', '$2', '$3', '$4')", $str);
 		if(!$linksOnly){
 			$html = preg_replace("/\B\@([a-zA-Z0-9_]{1,20}(\/\w+)?)/e", "_linkifyTweet_at('$1', '$2')", $html);
-			$html = preg_replace("/\B\#(\pL+)/eu", "_linkifyTweet_hashtag('$1', '$2')", $html);
+			$html = preg_replace("/\B\#([\pL|0-9|_]+)/eu", "_linkifyTweet_hashtag('$1', '$2')", $html);
 		}
 		return $html;
 	}
