@@ -50,10 +50,11 @@
 	$jQueryVersion     = "1.5.1";
 	
 	// Getting database time offset
-	$dbtQ = $db->query("SELECT TIME_FORMAT(NOW() - UTC_TIMESTAMP(), '%H%i') AS `diff`");
+	$dbtQ = $db->query("SELECT TIMESTAMPDIFF(SECOND, UTC_TIMESTAMP(), NOW()) AS `diff`");
 	$dbtR = $db->fetch($dbtQ);
 	
-	$dbOffset          = date("Z") - ($dbtR['diff'] * 36); if(!is_numeric($dbOffset)){ $dbOffset = 0; }
+	$dbOffset          = date("Z") - $dbtR['diff'];
+	if(!is_numeric($dbOffset)){ $dbOffset = 0; }
 	$dbOffset          = $dbOffset >= 0 ? "+" . $dbOffset : $dbOffset; // Explicit positivity/negativity
 	
 	global $db, $twitterApi, $search, $selectedDate, $highlightedMonths, $filterMode, $home, $dbOffset;
