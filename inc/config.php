@@ -16,7 +16,8 @@
 			'username'       => '', // The username to log in to your database
 			'password'       => '', // The password to log in to your database
 			'database'       => '', // The database name
-			'table_prefix'   => ''  // The prefix to table names in the database
+			'table_prefix'   => '', // The prefix to table names in the database
+			'charset'	 => ''  // The charset of your database
 		),
 		
 		// OPTIONAL -------------------------------------------
