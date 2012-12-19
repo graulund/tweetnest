@@ -50,6 +50,8 @@
 					} catch(Exception $e){
 						throw new Exception("Could not connect to the DB: " . $e->getMessage());
 					}
+					// set charset
+					$this->mysqli ? $this->res->set_charset($this->config['charset']) : mysql_query("set names ".$this->config['charset'], $this->res);
 					break;
 			}
 		}
