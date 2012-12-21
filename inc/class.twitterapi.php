@@ -183,6 +183,6 @@
 		public function insertQuery($t){
 			global $db;
 			$type = ($t['text'][0] == "@") ? 1 : (preg_match("/RT @\w+/", $t['text']) ? 2 : 0);
-			return "INSERT INTO `".DTP."tweets` (`userid`, `tweetid`, `type`, `time`, `text`, `source`, `extra`, `coordinates`, `geo`, `place`, `contributors`) VALUES ('" . $db->s($t['userid']) . "', '" . $db->s($t['tweetid']) . "', '" . $db->s($type) . "', '" . $db->s($t['time']) . "', '" . $db->s($this->entityDecode($t['text'])) . "', '" . $db->s($t['source']) . "', '" . $db->s(serialize($t['extra'])) . "', '" . $db->s(serialize($t['coordinates'])) . "', '" . $db->s(serialize($t['geo'])) . "', '" . $db->s(serialize($t['place'])) . "', '" . $db->s(serialize($t['contributors'])) . "');";
+			return "INSERT IGNORE INTO `".DTP."tweets` (`userid`, `tweetid`, `type`, `time`, `text`, `source`, `extra`, `coordinates`, `geo`, `place`, `contributors`) VALUES ('" . $db->s($t['userid']) . "', '" . $db->s($t['tweetid']) . "', '" . $db->s($type) . "', '" . $db->s($t['time']) . "', '" . $db->s($this->entityDecode($t['text'])) . "', '" . $db->s($t['source']) . "', '" . $db->s(serialize($t['extra'])) . "', '" . $db->s(serialize($t['coordinates'])) . "', '" . $db->s(serialize($t['geo'])) . "', '" . $db->s(serialize($t['place'])) . "', '" . $db->s(serialize($t['contributors'])) . "');";
 		}
 	}
