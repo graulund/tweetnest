@@ -1,6 +1,6 @@
-TWITTER ARCHIVE IMPORT:
+## Twitter archive import
 
-* Place your downloaded json archive files (data/js/tweets/[year]_[month].js) directly in the archive folder (archive/[year]_[month].js)
+* Place your downloaded json archive files (data/js/tweets/[year]\_[month].js) directly in the archive folder (archive/[year]\_[month].js)
 * On new tweet nest setups:
 	- follow the tweet nest instructions from http://pongsocket.com/tweetnest/#installation 
 	- right after the maintenance/loaduser.php step, run maintenance/loadarchive.php
@@ -13,7 +13,7 @@ The importer keeps track of its progress in maintenance/loadarchivelog.txt if it
 
 If you have a large archive (10k+ tweets), I would recommend to do the one-time import via cli (php -f maintenance/loadarchive.php)
 
-===
+---
 
 HI! THIS IS TWEET NEST.
 
