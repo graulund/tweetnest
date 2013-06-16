@@ -95,13 +95,8 @@
 	if($post){
 		$log[] = "Settings being submitted!";
 		$log[] = "PHP version: " . PHP_VERSION;
-		if(!empty($_POST['twitter_screenname']) && !empty($_POST['tz']) && !empty($_POST['path']) && !empty($_POST['db_hostname']) && !empty($_POST['db_username']) && !empty($_POST['db_database'])){ // Required fields
+		if(!empty($_POST['tz']) && !empty($_POST['path']) && !empty($_POST['db_hostname']) && !empty($_POST['db_username']) && !empty($_POST['db_database'])){ // Required fields
 			$log[] = "All required fields filled in.";
-			if(preg_match("/^[a-zA-Z0-9_]+$/", $_POST['twitter_screenname']) && strlen($_POST['twitter_screenname']) <= 15){
-				$log[] = "Valid Twitter screen name.";
-			} else {
-				$e[] = "Invalid Twitter screen name.";
-			}
 			if(date_default_timezone_set($_POST['tz'])){
 				$log[] = "Valid time zone.";
 			} else {
@@ -152,7 +147,7 @@
 						$DTP = $_POST['db_table_prefix']; // This has been verified earlier on in the code
 						
 						// Tweets table
-						$q = $db->query("CREATE TABLE `".$DTP."tweets` (`id` int(10) unsigned NOT NULL AUTO_INCREMENT, `userid` bigint(20) unsigned NOT NULL, `tweetid` varchar(100) NOT NULL, `type` tinyint(4) NOT NULL DEFAULT '0', `time` int(10) unsigned NOT NULL, `text` varchar(255) NOT NULL, `source` varchar(255) NOT NULL, `favorite` tinyint(4) NOT NULL DEFAULT '0', `extra` text NOT NULL, `coordinates` text NOT NULL, `geo` text NOT NULL, `place` text NOT NULL, `contributors` text NOT NULL, PRIMARY KEY (`id`), FULLTEXT KEY `text` (`text`)) ENGINE=MyISAM  DEFAULT CHARSET=utf8");
+						$q = $db->query("CREATE TABLE IF NOT EXISTS `".$DTP."tweets` (`id` int(10) unsigned NOT NULL AUTO_INCREMENT, `userid` bigint(20) unsigned NOT NULL, `tweetid` varchar(100) NOT NULL, `type` tinyint(4) NOT NULL DEFAULT '0', `time` int(10) unsigned NOT NULL, `text` varchar(255) NOT NULL, `source` varchar(255) NOT NULL, `favorite` tinyint(4) NOT NULL DEFAULT '0', `extra` text NOT NULL, `coordinates` text NOT NULL, `geo` text NOT NULL, `place` text NOT NULL, `contributors` text NOT NULL, PRIMARY KEY (`id`), FULLTEXT KEY `text` (`text`)) ENGINE=MyISAM  DEFAULT CHARSET=utf8");
 						if(!$q){
 							$e[] = "An error occured while creating table <code>".$DTP."tweets</code>: <code>" . $db->error() . "</code>";
 						} else { $log[] = "Successfully created table ".$DTP."tweets"; }
@@ -178,7 +173,7 @@
 						if(!$e){
 							// WRITE THE CONFIG FILE, YAY!
 							$cf = file_get_contents("inc/config.php");
-							$cf = configSetting($cf, "twitter_screenname", $_POST['twitter_screenname']);
+							$cf = configSetting($cf, "twitter_screenname", $_SESSION['access_token']['screen_name']);
                             $cf = configSetting($cf, "twitter_token", $_SESSION['access_token']['oauth_token']);
                             $cf = configSetting($cf, "twitter_token_secr", $_SESSION['access_token']['oauth_token_secret']);
 							$cf = configSetting($cf, "timezone", $_POST['tz']);
@@ -522,7 +517,6 @@
 	</style>
 </head>
 <body>
-<?php var_dump($_SESSION) ?>
 	<div id="container">
 		<a id="pongsk" href="http://pongsocket.com/" target="_blank" title="Open pongsocket.com in a new window">pongsocket</a>
 		<h1>Set up <strong>Tweet Nest</strong></h1>
