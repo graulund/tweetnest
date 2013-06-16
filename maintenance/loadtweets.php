@@ -46,7 +46,7 @@
 		global $twitterApi;
 		$p = trim($p);
 		if(!$twitterApi->validateUserParam($p)){ return false; }
-		$data = $twitterApi->query("1/users/show.json?" . $p);
+		$data = $twitterApi->query("users/show.json?" . $p);
 		if(is_array($data) && $data[0] === false){ dieout(l(bad("Error: " . $data[1] . "/" . $data[2]))); }
 		return $data->statuses_count;
 	}
@@ -94,7 +94,7 @@
 		// Retrieve tweets
 		do {
 			// Determine path to Twitter timeline resource
-			$path =	"1/statuses/user_timeline.json?" . $p . // <-- user argument
+			$path =	"statuses/user_timeline.json?" . $p . // <-- user argument
 					"&include_rts=true&include_entities=true&count=" . $maxCount .
 					($sinceID ? "&since_id=" . $sinceID : "") . ($maxID ? "&max_id=" . $maxID : "");
 			// Announce
@@ -160,7 +160,7 @@
 		// Resetting these
 		$favs  = array(); $maxID = 0; $sinceID = 0; $page = 1;
 		do {
-			$path = "1/favorites.json?" . $p . "&count=" . $maxCount . ($maxID ? "&max_id=" . $maxID : "");
+			$path = "favorites/list.json?" . $p . "&count=" . $maxCount . ($maxID ? "&max_id=" . $maxID : "");
 			echo l("Retrieving page <strong>#" . $page . "</strong>: <span class=\"address\">" . ls($path) . "</span>\n");
 			$data = $twitterApi->query($path);
 			if(is_array($data) && $data[0] === false){ dieout(l(bad("Error: " . $data[1] . "/" . $data[2]))); }
