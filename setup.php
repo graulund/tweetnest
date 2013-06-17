@@ -111,7 +111,7 @@
 				$e[] = "The two typed admin passwords didn&#8217;t match. Please make sure they&#8217;re the same.";
 			}
             if (!isset($_SESSION['access_token'])) {
-                $e[] = "Invalid Twitter oauth token";   // TODO prettify this
+                $e[] = "You must authorize Tweetnest to use your Twitter account before continuing.";
             }
 			$sPath = "/" . trim($_POST['path'], "/");
 			$log[] = "Formatted path: " . $sPath;
