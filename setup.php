@@ -9,6 +9,8 @@
 	
 	mb_language("uni");
 	mb_internal_encoding("UTF-8");
+    session_start();
+
 	header("Content-Type: text/html; charset=utf-8");
 	
 	require "inc/config.php";
@@ -88,19 +90,13 @@
 	// PREPARE VARIABLES
 	$pp   = strpos($_SERVER['REQUEST_URI'], "/setup");
 	$path = is_numeric($pp) ? ($pp > 0 ? substr($_SERVER['REQUEST_URI'], 0, $pp) : "/") : "";
-	$famousTwitterers = array("alyankovic", "aplusk", "billgates", "cnnbrk", "coldplay", "justinbieber"); // SO IMPORTANT!
 	
 	// Someone's submitting! Time to set up!
 	if($post){
 		$log[] = "Settings being submitted!";
 		$log[] = "PHP version: " . PHP_VERSION;
-		if(!empty($_POST['twitter_screenname']) && !empty($_POST['tz']) && !empty($_POST['path']) && !empty($_POST['db_hostname']) && !empty($_POST['db_username']) && !empty($_POST['db_database'])){ // Required fields
+		if(!empty($_POST['tz']) && !empty($_POST['path']) && !empty($_POST['db_hostname']) && !empty($_POST['db_username']) && !empty($_POST['db_database'])){ // Required fields
 			$log[] = "All required fields filled in.";
-			if(preg_match("/^[a-zA-Z0-9_]+$/", $_POST['twitter_screenname']) && strlen($_POST['twitter_screenname']) <= 15){
-				$log[] = "Valid Twitter screen name.";
-			} else {
-				$e[] = "Invalid Twitter screen name.";
-			}
 			if(date_default_timezone_set($_POST['tz'])){
 				$log[] = "Valid time zone.";
 			} else {
@@ -114,6 +110,9 @@
 			if(!empty($_POST['maintenance_http_password']) && $_POST['maintenance_http_password'] != $_POST['maintenance_http_password_2']){
 				$e[] = "The two typed admin passwords didn&#8217;t match. Please make sure they&#8217;re the same.";
 			}
+            if (!isset($_SESSION['access_token'])) {
+                $e[] = "You must authorize Tweetnest to use your Twitter account before continuing.";
+            }
 			$sPath = "/" . trim($_POST['path'], "/");
 			$log[] = "Formatted path: " . $sPath;
 			if(!$e){
@@ -148,25 +147,25 @@
 						$DTP = $_POST['db_table_prefix']; // This has been verified earlier on in the code
 						
 						// Tweets table
-						$q = $db->query("CREATE TABLE `".$DTP."tweets` (`id` int(10) unsigned NOT NULL AUTO_INCREMENT, `userid` bigint(20) unsigned NOT NULL, `tweetid` varchar(100) NOT NULL, `type` tinyint(4) NOT NULL DEFAULT '0', `time` int(10) unsigned NOT NULL, `text` varchar(255) NOT NULL, `source` varchar(255) NOT NULL, `favorite` tinyint(4) NOT NULL DEFAULT '0', `extra` text NOT NULL, `coordinates` text NOT NULL, `geo` text NOT NULL, `place` text NOT NULL, `contributors` text NOT NULL, PRIMARY KEY (`id`), FULLTEXT KEY `text` (`text`)) ENGINE=MyISAM  DEFAULT CHARSET=utf8");
+						$q = $db->query("CREATE TABLE IF NOT EXISTS `".$DTP."tweets` (`id` int(10) unsigned NOT NULL AUTO_INCREMENT, `userid` bigint(20) unsigned NOT NULL, `tweetid` varchar(100) NOT NULL, `type` tinyint(4) NOT NULL DEFAULT '0', `time` int(10) unsigned NOT NULL, `text` varchar(255) NOT NULL, `source` varchar(255) NOT NULL, `favorite` tinyint(4) NOT NULL DEFAULT '0', `extra` text NOT NULL, `coordinates` text NOT NULL, `geo` text NOT NULL, `place` text NOT NULL, `contributors` text NOT NULL, PRIMARY KEY (`id`), FULLTEXT KEY `text` (`text`)) ENGINE=MyISAM  DEFAULT CHARSET=utf8");
 						if(!$q){
 							$e[] = "An error occured while creating table <code>".$DTP."tweets</code>: <code>" . $db->error() . "</code>";
 						} else { $log[] = "Successfully created table ".$DTP."tweets"; }
 						
 						// Tweet users table
-						$q = $db->query("CREATE TABLE `".$DTP."tweetusers` (`id` int(10) unsigned NOT NULL AUTO_INCREMENT, `userid` bigint(20) unsigned NOT NULL, `screenname` varchar(25) NOT NULL, `realname` varchar(255) NOT NULL, `location` varchar(255) NOT NULL, `description` varchar(255) NOT NULL, `profileimage` varchar(255) NOT NULL, `url` varchar(255) NOT NULL, `extra` text NOT NULL, `enabled` tinyint(4) NOT NULL, PRIMARY KEY (`id`)) ENGINE=MyISAM  DEFAULT CHARSET=utf8");
+						$q = $db->query("CREATE TABLE IF NOT EXISTS `".$DTP."tweetusers` (`id` int(10) unsigned NOT NULL AUTO_INCREMENT, `userid` bigint(20) unsigned NOT NULL, `screenname` varchar(25) NOT NULL, `realname` varchar(255) NOT NULL, `location` varchar(255) NOT NULL, `description` varchar(255) NOT NULL, `profileimage` varchar(255) NOT NULL, `url` varchar(255) NOT NULL, `extra` text NOT NULL, `enabled` tinyint(4) NOT NULL, PRIMARY KEY (`id`)) ENGINE=MyISAM  DEFAULT CHARSET=utf8");
 						if(!$q){
 							$e[] = "An error occured while creating table <code>".$DTP."tweetusers</code>: <code>" . $db->error() . "</code>";
 						} else { $log[] = "Successfully created table ".$DTP."tweetusers"; }
 						
 						// Tweet words table
-						$q = $db->query("CREATE TABLE `".$DTP."tweetwords` (`id` int(10) unsigned NOT NULL AUTO_INCREMENT, `tweetid` int(10) unsigned NOT NULL, `wordid` int(10) unsigned NOT NULL, `frequency` float NOT NULL, PRIMARY KEY (`id`), KEY `tweetwords_tweetid` (`tweetid`), KEY `tweetwords_wordid` (`wordid`), KEY `tweetwords_frequency` (`frequency`)) ENGINE=MyISAM  DEFAULT CHARSET=utf8");
+						$q = $db->query("CREATE TABLE IF NOT EXISTS `".$DTP."tweetwords` (`id` int(10) unsigned NOT NULL AUTO_INCREMENT, `tweetid` int(10) unsigned NOT NULL, `wordid` int(10) unsigned NOT NULL, `frequency` float NOT NULL, PRIMARY KEY (`id`), KEY `tweetwords_tweetid` (`tweetid`), KEY `tweetwords_wordid` (`wordid`), KEY `tweetwords_frequency` (`frequency`)) ENGINE=MyISAM  DEFAULT CHARSET=utf8");
 						if(!$q){
 							$e[] = "An error occured while creating table <code>".$DTP."tweetwords</code>: <code>" . $db->error() . "</code>";
 						} else { $log[] = "Successfully created table ".$DTP."tweetwords"; }
 						
 						// Words table
-						$q = $db->query("CREATE TABLE `".$DTP."words` (`id` int(10) unsigned NOT NULL AUTO_INCREMENT, `word` varchar(150) NOT NULL, `tweets` int(11) NOT NULL, PRIMARY KEY (`id`), KEY `words_tweets` (`tweets`)) ENGINE=MyISAM  DEFAULT CHARSET=utf8");
+						$q = $db->query("CREATE TABLE IF NOT EXISTS `".$DTP."words` (`id` int(10) unsigned NOT NULL AUTO_INCREMENT, `word` varchar(150) NOT NULL, `tweets` int(11) NOT NULL, PRIMARY KEY (`id`), KEY `words_tweets` (`tweets`)) ENGINE=MyISAM  DEFAULT CHARSET=utf8");
 						if(!$q){
 							$e[] = "An error occured while creating table <code>".$DTP."words</code>: <code>" . $db->error() . "</code>";
 						} else { $log[] = "Successfully created table ".$DTP."words"; }
@@ -174,7 +173,9 @@
 						if(!$e){
 							// WRITE THE CONFIG FILE, YAY!
 							$cf = file_get_contents("inc/config.php");
-							$cf = configSetting($cf, "twitter_screenname", $_POST['twitter_screenname']);
+							$cf = configSetting($cf, "twitter_screenname", $_SESSION['access_token']['screen_name']);
+                            $cf = configSetting($cf, "twitter_token", $_SESSION['access_token']['oauth_token']);
+                            $cf = configSetting($cf, "twitter_token_secr", $_SESSION['access_token']['oauth_token_secret']);
 							$cf = configSetting($cf, "timezone", $_POST['tz']);
 							$cf = configSetting($cf, "path", $sPath);
 							$cf = configSetting($cf, "hostname", $_POST['db_hostname']);
@@ -559,9 +560,15 @@ INSTALL LOG: <?php var_dump($log); ?>
 			<h2>Basic settings</h2>
 			<div id="greennotice"><span></span>Green color means the value is <strong>required</strong></div>
 			<div class="input">
-				<label for="twitter_screenname">Twitter screen name</label>
-				<div class="field required"><input type="text" class="text" name="twitter_screenname" id="twitter_screenname" maxlength="15" value="<?php echo s($_POST['twitter_screenname']); ?>" /></div>
-				<div class="what">Your Twitter screen name is the name that&#8217;s in the URL of your profile page. <span class="address">Example: http://twitter.com/<strong><?php echo $famousTwitterers[array_rand($famousTwitterers)]; ?></strong></span></div>
+				<label for="twitter_auth">Twitter</label>
+				<div class="field">
+                    <?php
+                    if (!isset($_SESSION['access_token'])) {
+                        echo '<a href="redirect.php" id="twitter_auth"><img src="inc/twitteroauth/images/lighter.png" alt="Sign in with Twitter"/></a>';
+                    } else {
+                        echo 'Authorized';  // TODO prettify this
+                    }?></div>
+				<div class="what">Authorize Tweetnest to access your twitter account.</div>
 			</div>
 			<div class="input">
 				<label for="tz">Your time zone</label>

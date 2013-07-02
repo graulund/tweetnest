@@ -8,6 +8,8 @@
 	$config = array(
 		// REQUIRED VALUES ------------------------------------
 		'twitter_screenname' => '', // Your Twitter screen name
+        'twitter_token'      => '', // Twitter oauth secret token
+        'twitter_token_secr' => '', // Twitter oauth token
 		'timezone'           => '', // Choose one of these: http://php.net/manual/en/timezones.php
 		'path'               => '', // Where's your twitter installation on your domain? No end slash, please.
 		// Database values
