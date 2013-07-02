@@ -11,7 +11,18 @@
 	define("TWEET_NEST", "0.8.3"); // Version number
 	
 	require "config.php";
-	if(empty($config['twitter_screenname'])){ header("Location: ./setup.php"); exit; }
+
+	if(empty($config['twitter_screenname'])){
+
+        // Command-line notice
+        if(php_sapi_name() == 'cli'){
+            die("Please set up Tweet Nest before running any command-line scripts.\n");
+        }
+
+        // Web redirect
+        header("Location: ./setup.php"); exit;
+    }
+
 	date_default_timezone_set($config['timezone']);
 	define("DTP", $config['db']['table_prefix']);
 	
