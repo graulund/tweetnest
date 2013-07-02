@@ -16,6 +16,8 @@
 	require "inc/config.php";
 	
 	$GLOBALS['error'] = false;
+
+	$_SESSION['redirect_source'] = 'setup';
 	
 	function s($str){ return htmlspecialchars($str, ENT_NOQUOTES); } // Shorthand
 	
@@ -36,7 +38,7 @@
 	}
 	
 	function errorHandler($errno, $message, $filename, $line, $context){
-		if(error_reporting() == 0){ return; }
+		if(error_reporting() == 0){ return false; }
 		if($errno & (E_ALL ^ E_NOTICE)){
 			$GLOBALS['error'] = true;
 			$types = array(
@@ -59,12 +61,27 @@
 		return true;
 	}
 	set_error_handler("errorHandler");
-	
+
+	// Utility function, thanks to stackoverflow.com/questions/3835636
+	function str_lreplace($search, $replace, $subject){ $pos = strrpos($subject, $search); if($pos !== false){ $subject = substr_replace($subject, $replace, $pos, strlen($search)); } return $subject; }
+
+	// Function to insert configuration value into the array literal in the configuration file
 	function configSetting($cf, $setting, $value){
-		if($value === ""){ return $cf; } // Empty
-		$empty = is_bool($value) ? "(true|false)" : "''";
-		$val   = is_bool($value) ? ($value ? "true" : "false") : "'" . preg_replace("/([\\'])/", '\\\$1', $value) . "'";
-		return preg_replace("/'" . preg_quote($setting, "/") . "'(\s*)=>(\s*)" . $empty . "/", "'" . $setting . "'$1=>$2" . $val, $cf);
+		if($value === ''){ return $cf; } // Empty
+		$empty = is_bool($value) ? '(true|false)' : "''";
+		$val   = is_bool($value) ? ($value ? 'true' : 'false') : "'" . preg_replace("/([\\'])/", '\\\$1', $value) . "'";
+
+		// First check if the directive exists in the config file.
+		$directiveHead = "'" . preg_quote($setting, '/') . "'(\s*)=>";
+		$exists = preg_match('/' . $directiveHead . '/', $cf);
+
+		if($exists){
+			// If it exists, simply add the value instead of an empty one
+			return preg_replace('/' . $directiveHead . '(\s*)' . $empty . '/', "'" . $setting . "'$1=>$2" . $val, $cf);
+		} else {
+			// If it does not exist, let's add it to the end of the literal array in the file.
+			return str_lreplace(');', ",'" . $setting . "' => " . $val . "\n);", $cf);
+		}
 	}
 	
 	$e       = array();
@@ -86,6 +103,15 @@
 	if(!is_writable("inc/config.php")){ $e[] = "Your <code>config.php</code> file is not writable by the server. Please make sure it is before proceeding, then reload this page. Often, this is done through giving every system user the write privileges on that file through FTP."; }
 	if(!function_exists("preg_match")){ $e[] = "PHP&#8217;s PCRE support module appears to be missing. Tweet Nest requires Perl-style regular expression support to function."; }
 	if(!function_exists("mysql_connect") && !function_exists("mysqli_connect")){ $e[] = "Neither the MySQL nor the MySQLi library for PHP is installed. One of these are required, along with a MySQL server to connect to and store data in."; }
+
+	// Message shown when people have actively tried to go through OAuth but it failed verification
+	if(isset($_SESSION['status']) && $_SESSION['status'] == 'not verified'){
+		$e[] = '<strong>We could not verify you through Twitter.</strong> Please make sure you&#8217;ve entered the correct credentials on the Twitter authentication page.';
+	}
+	// Message shown when people have actively tried to go through OAuth but there was an old key or other mechanical mishap
+	if(isset($_SESSION['status']) && $_SESSION['status'] == 'try again'){
+		$e[] = '<strong>Something broke during the verification through Twitter.</strong> Please try again.';
+	}
 	
 	// PREPARE VARIABLES
 	$pp   = strpos($_SERVER['REQUEST_URI'], "/setup");
@@ -203,6 +229,7 @@
                             $cf = configSetting($cf, "consumer_key", $_POST['consumer_key']);
                             $cf = configSetting($cf, "consumer_secret", $_POST['consumer_secret']);
 							$cf = configSetting($cf, "twitter_screenname", $_SESSION['access_token']['screen_name']);
+							$cf = configSetting($cf, 'your_tw_screenname', $_SESSION['access_token']['screen_name']);
                             $cf = configSetting($cf, "twitter_token", $_SESSION['access_token']['oauth_token']);
                             $cf = configSetting($cf, "twitter_token_secr", $_SESSION['access_token']['oauth_token_secret']);
 							$cf = configSetting($cf, "timezone", $_POST['tz']);
@@ -630,7 +657,7 @@ INSTALL LOG: <?php var_dump($log); ?>
 				<label for="twitter_auth">Twitter</label>
 				<div class="field required">
                     <?php
-                    if (!isset($_SESSION['access_token'])) {
+                    if(!isset($_SESSION['access_token'])){
                         echo '<input type="image" src="inc/twitteroauth/images/lighter.png" alt="Sign in with Twitter" name="redirect" value="redirect">';
                     } else {
                         echo '<strong class="authorized">Authorized &#10004;</strong>';

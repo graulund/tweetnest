@@ -1,46 +1,57 @@
 <?php
-/**
- * @file
- * Take the user when they return from Twitter. Get access tokens.
- * Verify credentials and redirect to based on response from Twitter.
- */
+	/**
+	* @file
+	* Take the user when they return from Twitter. Get access tokens.
+	* Verify credentials and redirect to based on response from Twitter.
+	*/
 
-/* Start session and load lib */
-session_start();
-require_once('inc/twitteroauth/twitteroauth.php');
-require_once('inc/twitteroauth/config.php');
+	// Start session and load libraries
+	session_start();
+	require_once 'inc/twitteroauth/twitteroauth.php';
+	require_once 'inc/twitteroauth/config.php';
 
-/* If the oauth_token is old redirect to the connect page. */
-if (isset($_REQUEST['oauth_token']) && $_SESSION['oauth_token'] !== $_REQUEST['oauth_token']) {
-  $_SESSION['oauth_status'] = 'oldtoken';
-  header('Location: ./clearsessions.php');
-}
+	// Function to go back to the correct place in the user's current workflow
+	function goBackToTweetNestSetup(){
+		if($_SESSION['redirect_source'] == 'authorize'){
+			header('Location: ./authorize.php');
+		} else {
+			header('Location: ./setup.php');
+		}
+	}
 
-if(!defined('CONSUMER_KEY') || !defined('CONSUMER_SECRET')){
-    die('<strong>Consumer key and/or secret were not specified.</strong> Please check your configuration file, ' .
-        'or if you were setting up Tweet Nest, please provide these values before authenticating. ' .
-        'You can create them at <a href="http://dev.twitter.com/apps">dev.twitter.com</a>.');
-}
+	// If the oauth_token is old redirect to the connect page
+	if(isset($_REQUEST['oauth_token']) && $_SESSION['oauth_token'] !== $_REQUEST['oauth_token']){
+		$_SESSION['oauth_status'] = 'oldtoken';
+		$_SESSION['status'] = 'try again';
+		goBackToTweetNestSetup();
+		exit;
+	}
 
-/* Create TwitteroAuth object with app key/secret and token key/secret from default phase */
-$connection = new TwitterOAuth(CONSUMER_KEY, CONSUMER_SECRET, $_SESSION['oauth_token'], $_SESSION['oauth_token_secret']);
+	if(!defined('CONSUMER_KEY') || !defined('CONSUMER_SECRET')){
+	    die('<strong>Consumer key and/or secret were not specified.</strong> Please check your configuration file, ' .
+	        'or if you were setting up Tweet Nest, please provide these values before authenticating. ' .
+	        'You can create them at <a href="http://dev.twitter.com/apps">dev.twitter.com</a>.');
+	}
 
-/* Request access tokens from twitter */
-$access_token = $connection->getAccessToken($_REQUEST['oauth_verifier']);
+	// Create TwitterOAuth object with app key/secret and token key/secret from default phase
+	$connection = new TwitterOAuth(CONSUMER_KEY, CONSUMER_SECRET, $_SESSION['oauth_token'], $_SESSION['oauth_token_secret']);
 
-/* Save the access tokens. Normally these would be saved in a database for future use. */
-$_SESSION['access_token'] = $access_token;
+	// Request access tokens from Twitter
+	$access_token = $connection->getAccessToken($_REQUEST['oauth_verifier']);
 
-/* Remove no longer needed request tokens */
-unset($_SESSION['oauth_token']);
-unset($_SESSION['oauth_token_secret']);
+	// Save the access tokens
+	$_SESSION['access_token'] = $access_token;
 
-/* If HTTP response is 200 continue otherwise send to connect page to retry */
-if (200 == $connection->http_code) {
-  /* The user has been verified and the access tokens can be saved for future use */
-  $_SESSION['status'] = 'verified';
-  header('Location: ./setup.php');
-} else {
-  /* Save HTTP status for error dialog on connnect page.*/
-  header('Location: ./clearsessions.php');  // TODO: something here
-}
+	// Remove no longer needed request tokens
+	unset($_SESSION['oauth_token']);
+	unset($_SESSION['oauth_token_secret']);
+
+	// If HTTP response is 200, the user has been verified
+	if($connection->http_code == 200){
+		$_SESSION['status'] = 'verified';
+	} else {
+		$_SESSION['status'] = 'not verified';
+	}
+
+	// Send them back to the setup page regardless of what happens.
+	goBackToTweetNestSetup();

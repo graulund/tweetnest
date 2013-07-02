@@ -14,25 +14,40 @@
 	if(!defined('IS64BIT')){
 		define('IS64BIT', ((int)"9223372036854775807" > 2147483647));
 	}
+
+	// Valid screen names to log in with
+	$screenNames = array(
+		strtolower($config['twitter_screenname'])
+	);
+	if(array_key_exists('your_tw_screenname', $config)){
+		$screenNames[] = strtolower($config['your_tw_screenname']);
+	}
+
+	$unauthorized = (substr(php_sapi_name(), 0, 6) == 'apache' ? 'HTTP/1.0 ' : 'Status: ') . '401 Unauthorized';
 	
 	// Maintenance HTTP password
 	if($web && !empty($config['maintenance_http_password'])){
 		if(!empty($_SERVER['HTTP_AUTHORIZATION'])){
-			list($_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW']) = explode(":", base64_decode(substr($_SERVER['HTTP_AUTHORIZATION'], 6)));
+			list($_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW']) = explode(':', base64_decode(substr($_SERVER['HTTP_AUTHORIZATION'], 6)));
 		}
 		if(empty($_SERVER['PHP_AUTH_USER'])){
-			header((substr(php_sapi_name(), 0, 6) == "apache" ? "HTTP/1.0 " : "Status: ") . "401 Unauthorized");
+			header($unauthorized);
 			header('WWW-Authenticate: Basic realm="Tweet Archive Maintenance"');
-			die("Unauthorized. Log in with your maintenance HTTP password found in your config.");
+			die('Unauthorized. Log in with your Twitter screen name and the maintenance HTTP password found in your config.');
 		} else {
-			if(!(strtolower($_SERVER['PHP_AUTH_USER']) == strtolower($config['twitter_screenname']) && $_SERVER['PHP_AUTH_PW'] == $config['maintenance_http_password'])){
-				header((substr(php_sapi_name(), 0, 6) == "apache" ? "HTTP/1.0 " : "Status: ") . "401 Unauthorized");
+			if(!(in_array(strtolower($_SERVER['PHP_AUTH_USER']), $screenNames) && $_SERVER['PHP_AUTH_PW'] == $config['maintenance_http_password'])){
+				header($unauthorized);
 				header('WWW-Authenticate: Basic realm="Tweet Archive Maintenance"');
-				die("Unauthorized. Wrong username/password.");
+				die('Unauthorized. Wrong username/password. Log in with your Twitter screen name and the maintenance HTTP password found in your config.');
 			}
 		}
 	}
-	if($web && empty($config['maintenance_http_password'])){ die("No maintenance HTTP password. Please use the command line to run these scripts, or add a password in the <code>maintenance_http_password</code> section in <code>inc/config.php</code>."); } // Comment out this line to enable password-less HTTP maintenance access
+
+	// Comment out the below to enable password-less HTTP maintenance access
+	if($web && empty($config['maintenance_http_password'])){
+		die('No maintenance HTTP password set in the Tweet Nest configuration. Please use the command line to run these scripts, ' .
+			'or add a password in the <code>maintenance_http_password</code> section in <code>inc/config.php</code>.');
+	}
 	
 	function l($html){ // Display log line in correct way, depending on HTTP or not
 		global $web;

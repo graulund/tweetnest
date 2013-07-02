@@ -22,13 +22,25 @@ require_once "twitteroauth/config.php";
 			"user.id"      => "userid"
 		);
 
-        public function __construct() {
-            global $config;
-            $this->connection = new TwitterOAuth(CONSUMER_KEY, CONSUMER_SECRET, $config['twitter_token'], $config['twitter_token_secr']);
-        }
+		// Nothing here so far...
+        public function __construct(){}
+
+		// Only lazily create the OAuth connection when needed.
+		private function createConnection(){
+			global $config;
+			if(!$this->connection){
+				$this->connection = new TwitterOAuth(CONSUMER_KEY, CONSUMER_SECRET, $config['twitter_token'], $config['twitter_token_secr']);
+			}
+		}
 		
 		public function query($path, $parameters = array()){
-			return $this->connection->get($path, $parameters);
+			$this->createConnection();
+
+			if($this->connection instanceof TwitterOAuth){
+				return $this->connection->get($path, $parameters);
+			}
+
+			return null;
 		}
 		//TODO: BUILD IN SUPPORT FOR "RATE LIMIT EXCEEDED"
 		

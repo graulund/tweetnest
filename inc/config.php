@@ -9,9 +9,10 @@
 		// REQUIRED VALUES ------------------------------------
         'consumer_key'       => '', // Your Twitter app consumer key
         'consumer_secret'    => '', // Your Twitter app consumer secret
-		'twitter_screenname' => '', // Your Twitter screen name
-        'twitter_token'      => '', // Twitter oauth secret token
-        'twitter_token_secr' => '', // Twitter oauth token
+		'twitter_screenname' => '', // Twitter screen name of the one whose tweets are being recorded
+		'your_tw_screenname' => '', // Your Twitter screen name -- the one we log in as. Usually the same as above, but does not have to be.
+        'twitter_token'      => '', // Twitter oauth secret token (usually filled in automatically)
+        'twitter_token_secr' => '', // Twitter oauth token (usually filled in automatically)
 		'timezone'           => '', // Choose one of these: http://php.net/manual/en/timezones.php
 		'path'               => '', // Where's your twitter installation on your domain? No end slash, please.
 		// Database values
