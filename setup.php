@@ -614,12 +614,12 @@ INSTALL LOG: <?php var_dump($log); ?>
 			<div id="greennotice"><span></span>Green color means the value is <strong>required</strong></div>
             <div class="input">
                 <label for="consumer_key">Twitter consumer key</label>
-                <div class="field required"><input type="text" class="text" name="consumer_key" id="consumer_key" value="<?php echo $_POST['consumer_key'] ? s($_POST['consumer_key']) : ''; ?>" /></div>
+                <div class="field required"><input type="text" class="text" name="consumer_key" id="consumer_key" value="<?php echo s($enteredConsumerKey); ?>" /></div>
                 <div class="what">The consumer key of an app created and registered on <a href="http://dev.twitter.com/apps">dev.twitter.com</a>.</div>
             </div>
             <div class="input">
                 <label for="consumer_secret">Twitter consumer secret</label>
-                <div class="field required"><input type="text" class="text" name="consumer_secret" id="consumer_secret" value="<?php echo $_POST['consumer_secret'] ? s($_POST['consumer_secret']) : ''; ?>" /></div>
+                <div class="field required"><input type="text" class="text" name="consumer_secret" id="consumer_secret" value="<?php echo s($enteredConsumerSecret); ?>" /></div>
                 <div class="what">The consumer secret of the above.</div>
             </div>
 			<div class="input">
