@@ -77,15 +77,3 @@ $(document).ready(function(){
 		$(window).resize(IEresize)
 	}
 })
-
-// Using our OAuth key to activate subtle @anywhere features
-if(window.twttr && window.twttr.anywhere){
-	twttr.anywhere(function(T){
-		T(".tweet a.user").hovercards({
-			username: function(node){ return node.href.match(/[a-zA-Z0-9_]+$/)[0] }
-		})
-		T(".tweet a.rt, #author h2 a").hovercards({ 
-			username: function(node){ return node.parentNode.href.match(/[a-zA-Z0-9_]+$/)[0] }
-		})
-	})
-}

@@ -16,8 +16,7 @@
 	<meta name="description" content="An archive of all tweets written by <?php echo s(rtrim($author['realname'], ".")); ?>." />
 	<meta name="author" content="<?php echo s($author['realname']); ?>" />
 	<link rel="stylesheet" href="<?php echo s($styleFile); ?>" type="text/css" />
-	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/<?php echo s($jQueryVersion); ?>/jquery.min.js"></script>
-<?php if($config['anywhere_apikey']){ ?>	<script type="text/javascript" src="http://platform.twitter.com/anywhere.js?id=<?php echo s($config['anywhere_apikey']); ?>&amp;v=1"></script><?php echo "\n"; } ?>
+	<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/<?php echo s($jQueryVersion); ?>/jquery.min.js"></script>
 	<script type="text/javascript" src="<?php echo $path; ?>/tweets.js"></script>
 </head>
 <body>
