@@ -563,8 +563,12 @@
 			margin: 0 0 .5em;
 		}
 
-        .authorized {
-            color: #090;
+        #content strong.authorized {
+            color: #fff;
+            background-color: #0c0;
+            padding: 2px 8px;
+            border-radius: 3px;
+            margin-left: 1px;
         }
 		
 	</style>
@@ -629,7 +633,7 @@ INSTALL LOG: <?php var_dump($log); ?>
                     if (!isset($_SESSION['access_token'])) {
                         echo '<input type="image" src="inc/twitteroauth/images/lighter.png" alt="Sign in with Twitter" name="redirect" value="redirect">';
                     } else {
-                        echo '<strong class="authorized">Authorized</strong>';
+                        echo '<strong class="authorized">Authorized &#10004;</strong>';
                     }?></div>
 				<div class="what">Authorize Tweetnest to access your twitter account.</div>
 			</div>
