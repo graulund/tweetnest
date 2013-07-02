@@ -33,8 +33,19 @@
 					$this->mysqli = extension_loaded("mysqli");
 					try {
 						$this->on   = true;
+
+                        // Detecting port (MySQLi constructor requires this separately from the hostname)
+                        list($host, $port) = explode(':', $this->config['hostname']);
+                        if(!$port){
+                            $port = $this->mysqli ? ini_get('mysqli.default_port') : ini_get('mysql.default_port');
+                            if(!$port){
+                                // In some cases, there are bugs in the default_port directive that results in a value of zero.
+                                $port = 3306;
+                            }
+                        }
+
 						$this->res  = $this->mysqli ?
-							new mysqli($this->config['hostname'], $this->config['username'], $this->config['password'], $this->config['database']) :
+							new mysqli($host, $this->config['username'], $this->config['password'], $this->config['database'], $port) :
 							mysql_connect($this->config['hostname'], $this->config['username'], $this->config['password']);
 						if(!$this->mysqli){ mysql_select_db($this->config['database'], $this->res); }
 						$this->conn = true;
