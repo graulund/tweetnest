@@ -122,6 +122,12 @@
 			if(!empty($data)){
 				echo l("<ul>");
 				foreach($data as $i => $tweet){
+
+                    // First, let's check if an API error occured
+                    if(is_array($tweet) && is_object($tweet[0]) && property_exists('message', $tweet[0])){
+                        dieout(l(bad('A Twitter API error occured: ' . $tweet[0]->message)));
+                    }
+
 					// Shield against duplicate tweet from max_id
 					if(!IS64BIT && $i == 0 && $maxID == $tweet->id_str){ unset($data[0]); continue; }
 					// List tweet
@@ -192,6 +198,12 @@
 			if(!empty($data)){
 				echo l("<ul>");
 				foreach($data as $i => $tweet){
+
+                    // First, let's check if an API error occured
+                    if(is_array($tweet) && is_object($tweet[0]) && property_exists('message', $tweet[0])){
+                        dieout(l(bad('A Twitter API error occured: ' . $tweet[0]->message)));
+                    }
+
 					if(!IS64BIT && $i == 0 && $maxID == $tweet->id_str){ unset($data[0]); continue; }
 					if($tweet->user->id_str == $uid){
 						echo l("<li>" . $tweet->id_str . " " . $tweet->created_at . "</li>\n");
