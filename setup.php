@@ -147,13 +147,17 @@
 						$DTP = $_POST['db_table_prefix']; // This has been verified earlier on in the code
 						
 						// Tweets table
-						$q = $db->query("CREATE TABLE IF NOT EXISTS `".$DTP."tweets` (`id` int(10) unsigned NOT NULL AUTO_INCREMENT, `userid` bigint(20) unsigned NOT NULL, `tweetid` varchar(100) NOT NULL, `type` tinyint(4) NOT NULL DEFAULT '0', `time` int(10) unsigned NOT NULL, `text` varchar(255) NOT NULL, `source` varchar(255) NOT NULL, `favorite` tinyint(4) NOT NULL DEFAULT '0', `extra` text NOT NULL, `coordinates` text NOT NULL, `geo` text NOT NULL, `place` text NOT NULL, `contributors` text NOT NULL, PRIMARY KEY (`id`), UNIQUE (`tweetid`), FULLTEXT KEY `text` (`text`)) ENGINE=MyISAM  DEFAULT CHARSET=utf8");
+						$q = $db->query("CREATE TABLE IF NOT EXISTS `".$DTP."tweets` (`id` int(10) unsigned NOT NULL AUTO_INCREMENT, `userid` varchar(100) unsigned NOT NULL, `tweetid` varchar(100) NOT NULL, `type` tinyint(4) NOT NULL DEFAULT '0', `time` int(10) unsigned NOT NULL, `text` varchar(255) NOT NULL, `source` varchar(255) NOT NULL, `favorite` tinyint(4) NOT NULL DEFAULT '0', `extra` text NOT NULL, `coordinates` text NOT NULL, `geo` text NOT NULL, `place` text NOT NULL, `contributors` text NOT NULL, PRIMARY KEY (`id`), UNIQUE (`tweetid`), FULLTEXT KEY `text` (`text`)) ENGINE=MyISAM  DEFAULT CHARSET=utf8");
+
 						if(!$q){
 							$e[] = "An error occured while creating table <code>".$DTP."tweets</code>: <code>" . $db->error() . "</code>";
 						} else { $log[] = "Successfully created table ".$DTP."tweets"; }
+
+                        // Alter the tweets text column to support greater than 255 characters, but only if the database version supports it. Otherwise, ignore the error.
+                        $db->query('ALTER TABLE `'.DTP.'tweets` CHANGE `text` `text` VARCHAR(510) NOT NULL');
 						
 						// Tweet users table
-						$q = $db->query("CREATE TABLE IF NOT EXISTS `".$DTP."tweetusers` (`id` int(10) unsigned NOT NULL AUTO_INCREMENT, `userid` bigint(20) unsigned NOT NULL, `screenname` varchar(25) NOT NULL, `realname` varchar(255) NOT NULL, `location` varchar(255) NOT NULL, `description` varchar(255) NOT NULL, `profileimage` varchar(255) NOT NULL, `url` varchar(255) NOT NULL, `extra` text NOT NULL, `enabled` tinyint(4) NOT NULL, PRIMARY KEY (`id`)) ENGINE=MyISAM  DEFAULT CHARSET=utf8");
+						$q = $db->query("CREATE TABLE IF NOT EXISTS `".$DTP."tweetusers` (`id` int(10) unsigned NOT NULL AUTO_INCREMENT, `userid` varchar(100) unsigned NOT NULL, `screenname` varchar(25) NOT NULL, `realname` varchar(255) NOT NULL, `location` varchar(255) NOT NULL, `description` varchar(255) NOT NULL, `profileimage` varchar(255) NOT NULL, `url` varchar(255) NOT NULL, `extra` text NOT NULL, `enabled` tinyint(4) NOT NULL, PRIMARY KEY (`id`), UNIQUE (`userid`) ) ENGINE=MyISAM  DEFAULT CHARSET=utf8");
 						if(!$q){
 							$e[] = "An error occured while creating table <code>".$DTP."tweetusers</code>: <code>" . $db->error() . "</code>";
 						} else { $log[] = "Successfully created table ".$DTP."tweetusers"; }
