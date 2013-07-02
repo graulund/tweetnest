@@ -48,7 +48,7 @@
 					if($imgid){
 						if($domain == "twimg.com"){
 							$displaylink = $linkmap ? $linkmap[$link] : $link;
-							$imgs[$displaylink] = $http . "://p.twimg.com" . $l['path'] . ":thumb";
+							$imgs[$displaylink] = $http . "://pbs.twimg.com" . $l['path'] . ":thumb";
 						}
 						if($domain == "twitpic.com"){
 							$imgs[$link] = $http . "://twitpic.com/show/thumb/" . $imgid;
