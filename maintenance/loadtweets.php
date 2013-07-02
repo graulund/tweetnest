@@ -71,7 +71,7 @@
 			$uid        = $pd['value'];
 			$screenname = $twitterApi->getScreenName($pd['value']);
 		}
-		$tiQ = $db->query("SELECT `tweetid` FROM `".DTP."tweets` WHERE `userid` = '" . $db->s($uid) . "' ORDER BY `id` DESC LIMIT 1");
+		$tiQ = $db->query("SELECT `tweetid` FROM `".DTP."tweets` WHERE `userid` = '" . $db->s($uid) . "' ORDER BY `time` DESC LIMIT 1");
 		if($db->numRows($tiQ) > 0){
 			$ti      = $db->fetch($tiQ);
 			$sinceID = $ti['tweetid'];
