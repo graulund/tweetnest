@@ -7,6 +7,8 @@
 
 	$config = array(
 		// REQUIRED VALUES ------------------------------------
+        'consumer_key'       => '', // Your Twitter app consumer key
+        'consumer_secret'    => '', // Your Twitter app consumer secret
 		'twitter_screenname' => '', // Your Twitter screen name
         'twitter_token'      => '', // Twitter oauth secret token
         'twitter_token_secr' => '', // Twitter oauth token

@@ -93,9 +93,32 @@
 	
 	// Someone's submitting! Time to set up!
 	if($post){
+
+
+        // Are we redirecting?
+        if(isset($_POST['redirect']) && !empty($_POST['redirect'])){
+            if(
+                isset($_POST['consumer_key']) && !empty($_POST['consumer_key']) &&
+                isset($_POST['consumer_secret']) && !empty($_POST['consumer_secret'])
+            ){
+                if(!isset($config) || !is_array($config)){
+                    $config = array();
+                }
+
+                $config['consumer_key']    = $_POST['consumer_key'];
+                $config['consumer_secret'] = $_POST['consumer_secret'];
+
+                require 'redirect.php';
+                exit;
+            } else {
+                $e[] = 'Please fill in your <strong>Twitter app consumer key and secret</strong> before authenticating with Twitter. ' .
+                    'You can get these by creating an app at <a href="http://dev.twitter.com">dev.twitter.com</a>.';
+            }
+        }
+
 		$log[] = "Settings being submitted!";
 		$log[] = "PHP version: " . PHP_VERSION;
-		if(!empty($_POST['tz']) && !empty($_POST['path']) && !empty($_POST['db_hostname']) && !empty($_POST['db_username']) && !empty($_POST['db_database'])){ // Required fields
+		if(empty($e) && !empty($_POST['tz']) && !empty($_POST['path']) && !empty($_POST['db_hostname']) && !empty($_POST['db_username']) && !empty($_POST['db_database'])){ // Required fields
 			$log[] = "All required fields filled in.";
 			if(date_default_timezone_set($_POST['tz'])){
 				$log[] = "Valid time zone.";
@@ -177,6 +200,8 @@
 						if(!$e){
 							// WRITE THE CONFIG FILE, YAY!
 							$cf = file_get_contents("inc/config.php");
+                            $cf = configSetting($cf, "consumer_key", $_POST['consumer_key']);
+                            $cf = configSetting($cf, "consumer_secret", $_POST['consumer_secret']);
 							$cf = configSetting($cf, "twitter_screenname", $_SESSION['access_token']['screen_name']);
                             $cf = configSetting($cf, "twitter_token", $_SESSION['access_token']['oauth_token']);
                             $cf = configSetting($cf, "twitter_token_secr", $_SESSION['access_token']['oauth_token_secret']);
@@ -471,6 +496,10 @@
 		input.submit:active {
 			padding: 8px 15px 6px;
 		}
+
+        input[type=image] {
+            cursor: pointer;
+        }
 		
 		option.deselected {
 			font-style: italic;
@@ -516,6 +545,10 @@
 		.explanation li {
 			margin: 0 0 .5em;
 		}
+
+        .authorized {
+            color: #090;
+        }
 		
 	</style>
 </head>
@@ -562,14 +595,24 @@ INSTALL LOG: <?php var_dump($log); ?>
 <?php } ?>
 			<h2>Basic settings</h2>
 			<div id="greennotice"><span></span>Green color means the value is <strong>required</strong></div>
+            <div class="input">
+                <label for="consumer_key">Twitter consumer key</label>
+                <div class="field required"><input type="text" class="text" name="consumer_key" id="consumer_key" value="<?php echo $_POST['consumer_key'] ? s($_POST['consumer_key']) : ''; ?>" /></div>
+                <div class="what">The consumer key of an app created and registered on <a href="http://dev.twitter.com">dev.twitter.com</a>.</div>
+            </div>
+            <div class="input">
+                <label for="consumer_secret">Twitter consumer secret</label>
+                <div class="field required"><input type="text" class="text" name="consumer_secret" id="consumer_secret" value="<?php echo $_POST['consumer_secret'] ? s($_POST['consumer_secret']) : ''; ?>" /></div>
+                <div class="what">The consumer secret of the above.</div>
+            </div>
 			<div class="input">
 				<label for="twitter_auth">Twitter</label>
-				<div class="field">
+				<div class="field required">
                     <?php
                     if (!isset($_SESSION['access_token'])) {
-                        echo '<a href="redirect.php" id="twitter_auth"><img src="inc/twitteroauth/images/lighter.png" alt="Sign in with Twitter"/></a>';
+                        echo '<input type="image" src="inc/twitteroauth/images/lighter.png" alt="Sign in with Twitter" name="redirect" value="redirect">';
                     } else {
-                        echo 'Authorized';  // TODO prettify this
+                        echo '<strong class="authorized">Authorized</strong>';
                     }?></div>
 				<div class="what">Authorize Tweetnest to access your twitter account.</div>
 			</div>
