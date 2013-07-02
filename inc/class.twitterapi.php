@@ -27,8 +27,8 @@ require_once "twitteroauth/config.php";
             $this->connection = new TwitterOAuth(CONSUMER_KEY, CONSUMER_SECRET, $config['twitter_token'], $config['twitter_token_secr']);
         }
 		
-		public function query($path){
-			return $this->connection->get($path);
+		public function query($path, $parameters = array()){
+			return $this->connection->get($path, $parameters);
 		}
 		//TODO: BUILD IN SUPPORT FOR "RATE LIMIT EXCEEDED"
 		

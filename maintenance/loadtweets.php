@@ -46,7 +46,8 @@
 		global $twitterApi;
 		$p = trim($p);
 		if(!$twitterApi->validateUserParam($p)){ return false; }
-		$data = $twitterApi->query("users/show.json?" . $p);
+        $p = explode('=', $p);
+        $data = $twitterApi->query('users/show', array($p[0] => $p[1]));
 		if(is_array($data) && $data[0] === false){ dieout(l(bad("Error: " . $data[1] . "/" . $data[2]))); }
 		return $data->statuses_count;
 	}
@@ -59,6 +60,8 @@
 		$tweets   = array();
 		$sinceID  = 0;
 		$maxID    = 0;
+
+        list($userparam, $uservalue) = explode('=', $p);
 		
 		echo l("Importing:\n");
 		
@@ -93,14 +96,24 @@
 		
 		// Retrieve tweets
 		do {
-			// Determine path to Twitter timeline resource
-			$path =	"statuses/user_timeline.json?" . $p . // <-- user argument
-					"&include_rts=true&include_entities=true&count=" . $maxCount .
-					($sinceID ? "&since_id=" . $sinceID : "") . ($maxID ? "&max_id=" . $maxID : "");
 			// Announce
-			echo l("Retrieving page <strong>#" . $page . "</strong>: <span class=\"address\">" . ls($path) . "</span>\n");
+			echo l("Retrieving page <strong>#" . $page . "</strong>:\n");
 			// Get data
-			$data = $twitterApi->query($path);
+            $params = array(
+                $userparam         => $uservalue,
+                'include_rts'      => true,
+                'include_entities' => true,
+                'count'            => $maxCount
+            );
+
+            if($sinceID){
+                $params['since_id'] = $sinceID;
+            }
+            if($maxID){
+                $params['max_id']   = $maxID;
+            }
+
+            $data = $twitterApi->query('statuses/user_timeline', $params);
 			// Drop out on connection error
 			if(is_array($data) && $data[0] === false){ dieout(l(bad("Error: " . $data[1] . "/" . $data[2]))); }
 			
@@ -160,11 +173,22 @@
 		// Resetting these
 		$favs  = array(); $maxID = 0; $sinceID = 0; $page = 1;
 		do {
-			$path = "favorites/list.json?" . $p . "&count=" . $maxCount . ($maxID ? "&max_id=" . $maxID : "");
-			echo l("Retrieving page <strong>#" . $page . "</strong>: <span class=\"address\">" . ls($path) . "</span>\n");
-			$data = $twitterApi->query($path);
+			echo l("Retrieving page <strong>#" . $page . "</strong>:\n");
+
+            $params = array(
+                $userparam => $uservalue,
+                'count'    => $maxCount
+            );
+
+            if($maxID){
+                $params['max_id']   = $maxID;
+            }
+
+			$data = $twitterApi->query('favorites/list', $params);
+
 			if(is_array($data) && $data[0] === false){ dieout(l(bad("Error: " . $data[1] . "/" . $data[2]))); }
 			echo l("<strong>" . ($data ? count($data) : 0) . "</strong> total favorite tweets on this page\n");
+
 			if(!empty($data)){
 				echo l("<ul>");
 				foreach($data as $i => $tweet){
