@@ -105,14 +105,14 @@
                     $config = array();
                 }
 
-                $config['consumer_key']    = $_POST['consumer_key'];
-                $config['consumer_secret'] = $_POST['consumer_secret'];
+                $config['consumer_key']    = $_SESSION['entered_consumer_key']    = $_POST['consumer_key'];
+                $config['consumer_secret'] = $_SESSION['entered_consumer_secret'] = $_POST['consumer_secret'];
 
                 require 'redirect.php';
                 exit;
             } else {
                 $e[] = 'Please fill in your <strong>Twitter app consumer key and secret</strong> before authenticating with Twitter. ' .
-                    'You can get these by creating an app at <a href="http://dev.twitter.com">dev.twitter.com</a>.';
+                    'You can get these by creating an app at <a href="http://dev.twitter.com/apps">dev.twitter.com</a>.';
             }
         }
 
@@ -134,7 +134,7 @@
 				$e[] = "The two typed admin passwords didn&#8217;t match. Please make sure they&#8217;re the same.";
 			}
             if (!isset($_SESSION['access_token'])) {
-                $e[] = "You must authorize Tweetnest to use your Twitter account before continuing.";
+                $e[] = "You must authorize Tweet Nest to use your Twitter account before continuing.";
             }
 			$sPath = "/" . trim($_POST['path'], "/");
 			$log[] = "Formatted path: " . $sPath;
@@ -235,6 +235,23 @@
 			$e[] = "Not all required fields were filled in!";
 		}
 	}
+
+    // Form preparation
+    $enteredConsumerKey = '';
+    $enteredConsumerSecret = '';
+
+    if(isset($_SESSION['entered_consumer_key']) && !empty($_SESSION['entered_consumer_key'])){
+        $enteredConsumerKey = $_SESSION['entered_consumer_key'];
+    }
+    if(isset($_SESSION['entered_consumer_secret']) && !empty($_SESSION['entered_consumer_secret'])){
+        $enteredConsumerSecret = $_SESSION['entered_consumer_secret'];
+    }
+    if($post && isset($_POST['consumer_key']) && !empty($_POST['consumer_key'])){
+        $enteredConsumerKey = $_POST['consumer_key'];
+    }
+    if($post && isset($_POST['consumer_secret']) && !empty($_POST['consumer_secret'])){
+        $enteredConsumerSecret = $_POST['consumer_secret'];
+    }
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
@@ -598,7 +615,7 @@ INSTALL LOG: <?php var_dump($log); ?>
             <div class="input">
                 <label for="consumer_key">Twitter consumer key</label>
                 <div class="field required"><input type="text" class="text" name="consumer_key" id="consumer_key" value="<?php echo $_POST['consumer_key'] ? s($_POST['consumer_key']) : ''; ?>" /></div>
-                <div class="what">The consumer key of an app created and registered on <a href="http://dev.twitter.com">dev.twitter.com</a>.</div>
+                <div class="what">The consumer key of an app created and registered on <a href="http://dev.twitter.com/apps">dev.twitter.com</a>.</div>
             </div>
             <div class="input">
                 <label for="consumer_secret">Twitter consumer secret</label>
