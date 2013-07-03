@@ -672,7 +672,7 @@ INSTALL LOG: <?php var_dump($log); ?>
                     } else {
                         echo '<strong class="authorized">Authorized &#10004;</strong>';
                     }?></div>
-				<div class="what">Authorize Tweetnest to access your twitter account.</div>
+				<div class="what">Authorize Tweetnest to access your twitter account. Please fill in the consumer key and secret fields before clicking this.</div>
 			</div>
 			<div class="input">
 				<label for="tz">Your time zone</label>
