@@ -5,12 +5,12 @@
 	$startTime = microtime(true);
 	
 	error_reporting(E_ALL ^ E_NOTICE);
-	mb_language("uni");
-	mb_internal_encoding("UTF-8");
+	mb_language('uni');
+	mb_internal_encoding('UTF-8');
 	
-	define("TWEET_NEST", "0.8.3"); // Version number
+	define('TWEET_NEST', '1.1'); // Version number
 	
-	require "config.php";
+	require 'config.php';
 
 	if(empty($config['twitter_screenname'])){
 
@@ -20,56 +20,56 @@
         }
 
         // Web redirect
-        header("Location: ./setup.php"); exit;
+        header('Location: ./setup.php'); exit;
     }
 
 	date_default_timezone_set($config['timezone']);
-	define("DTP", $config['db']['table_prefix']);
+	define('DTP', $config['db']['table_prefix']);
 	
 	// Get the full path
 	$fPath = explode(DIRECTORY_SEPARATOR, rtrim(__FILE__, DIRECTORY_SEPARATOR));
 	array_pop($fPath); array_pop($fPath); // Remove inc/preheader.php
-	$fPath = implode($fPath, "/");
-	define("FULL_PATH", $fPath);
+	$fPath = implode($fPath, '/');
+	define('FULL_PATH', $fPath);
 	
 	// SmartyPants
-	include "smartypants.php";
+	include 'smartypants.php';
 	
 	// DB
-	require "class.db.php";
-	$db = new DB("mysql", $config['db']);
+	require 'class.db.php';
+	$db = new DB('mysql', $config['db']);
 	if(!$delayedDB){ unset($config['db']['password']); }
 	
 	// Twitter API class
-	require "class.twitterapi.php";
+	require 'class.twitterapi.php';
 	$twitterApi = new TwitterApi();
 	
 	// Search
-	require "class.search.php";
+	require 'class.search.php';
 	$search = new TweetNestSearch();
 	
 	// Outputting various generic parts
-	require "html.php";
+	require 'html.php';
 	
 	// Extensions
-	require "extensions.php";
+	require 'extensions.php';
 	
-	$selectedDate      = array("y" => 0, "m" => 0, "d" => 0);
+	$selectedDate      = array('y' => 0, 'm' => 0, 'd' => 0);
 	$highlightedMonths = array();
-	$filterMode        = "search";
+	$filterMode        = 'search';
 	$home              = false;
 	$jQueryVersion     = '1';
 	
 	// Getting database time offset
-	$dbtQ = $db->query("SELECT TIMESTAMPDIFF(SECOND, UTC_TIMESTAMP(), NOW()) AS `diff`");
+	$dbtQ = $db->query('SELECT TIMESTAMPDIFF(SECOND, UTC_TIMESTAMP(), NOW()) AS `diff`');
 	$dbtR = $db->fetch($dbtQ);
 	
-	$dbOffset          = date("Z") - $dbtR['diff'];
+	$dbOffset          = date('Z') - $dbtR['diff'];
 	if(!is_numeric($dbOffset)){ $dbOffset = 0; }
-	$dbOffset          = $dbOffset >= 0 ? "+" . $dbOffset : $dbOffset; // Explicit positivity/negativity
+	$dbOffset          = $dbOffset >= 0 ? '+' . $dbOffset : $dbOffset; // Explicit positivity/negativity
 	
 	global $db, $twitterApi, $search, $selectedDate, $highlightedMonths, $filterMode, $home, $dbOffset;
-	define("DB_OFFSET", $dbOffset);
+	define('DB_OFFSET', $dbOffset);
 	
 	// String manipulation functions
 	if(!function_exists('s')){ function s($str, $flags = ENT_COMPAT){ return htmlspecialchars($str, $flags); }} // Shorthand
@@ -77,17 +77,13 @@
 	function p($str, $attr = NULL, $force = false){ global $config; return ($config['smartypants'] || $force) ? SmartyPants($str, $attr) : $str; }
 	
 	// Numeric manipulation functions
-	function pad($int){ if($int < 10){ return "0" . $int; } return $int; }
-	
-	// Consts
-	define("PST_GZIP", (substr_count($_SERVER['HTTP_ACCEPT_ENCODING'], "gzip") > 0));
-	define("PST_GZIP_S", (PST_GZIP ? ".gz" : ""));
+	function pad($int){ if($int < 10){ return '0' . $int; } return $int; }
 	
 	// Check for cURL
-	if(!extension_loaded("curl")){
-	    $prefix = (PHP_SHLIB_SUFFIX === "dll") ? "php_" : "";
-	    if(!function_exists("dl") || !@dl($prefix . "curl." . PHP_SHLIB_SUFFIX)){
-	        trigger_error("Unable to load the PHP cURL extension.", E_USER_ERROR);
+	if(!extension_loaded('curl')){
+	    $prefix = (PHP_SHLIB_SUFFIX === 'dll') ? 'php_' : '';
+	    if(!function_exists('dl') || !@dl($prefix . 'curl.' . PHP_SHLIB_SUFFIX)){
+	        trigger_error('Unable to load the PHP cURL extension.', E_USER_ERROR);
 	        exit;
 	    }
 	}
