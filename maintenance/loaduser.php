@@ -2,29 +2,36 @@
 	// TWEET NEST
 	// Load user
 	
-	require "mpreheader.php";
-	$pageTitle = "Loading user info";
-	require "mheader.php";
-	
+	require 'mpreheader.php';
+	$pageTitle = 'Loading user info';
+	require 'mheader.php';
+
+	// Check for authentication
+	if(!isset($config['consumer_key']) || !isset($config['consumer_secret'])){
+		die("Consumer key and secret not found. These are required for authentication to Twitter. \n" .
+			"Please point your browser to the authorize.php file to configure these.\n");
+	}
+
+	// Continue...
 	echo l("Connecting & parsing...\n");
-	$path = "account/verify_credentials";
-	echo l("Connecting to: <span class=\"address\">" . ls($path) . "</span>\n");
+	$path = 'account/verify_credentials';
+	echo l('Connecting to: <span class="address">' . ls($path) . "</span>\n");
 	
 	$data = $twitterApi->query($path);
 
 	if($data){
 		$extra = array(
-			"created_at" => (string) $data->created_at,
-			"utc_offset" => (string) $data->utc_offset,
-			"time_zone"  => (string) $data->time_zone,
-			"lang"       => (string) $data->lang,
-			"profile_background_color"     => (string) $data->profile_background_color,
-			"profile_text_color"           => (string) $data->profile_text_color,
-			"profile_link_color"           => (string) $data->profile_link_color,
-			"profile_sidebar_fill_color"   => (string) $data->profile_sidebar_fill_color,
-			"profile_sidebar_border_color" => (string) $data->profile_sidebar_border_color,
-			"profile_background_image_url" => (string) $data->profile_background_image_url,
-			"profile_background_tile"      => (string) $data->profile_background_tile
+			'created_at' => (string) $data->created_at,
+			'utc_offset' => (string) $data->utc_offset,
+			'time_zone'  => (string) $data->time_zone,
+			'lang'       => (string) $data->lang,
+			'profile_background_color'     => (string) $data->profile_background_color,
+			'profile_text_color'           => (string) $data->profile_text_color,
+			'profile_link_color'           => (string) $data->profile_link_color,
+			'profile_sidebar_fill_color'   => (string) $data->profile_sidebar_fill_color,
+			'profile_sidebar_border_color' => (string) $data->profile_sidebar_border_color,
+			'profile_background_image_url' => (string) $data->profile_background_image_url,
+			'profile_background_tile'      => (string) $data->profile_background_tile
 		);
 		echo l("Checking...\n");
 		$db->query("DELETE FROM `".DTP."tweetusers` WHERE `userid` = '0'"); // Getting rid of empty users created in error
@@ -36,7 +43,7 @@
 		}
 		echo l("Updating...\n");
 		$q = $db->query($iq);
-		echo $q ? l(good("Done!")) : l(bad("DATABASE ERROR: " . $db->error()));
-	} else { echo l(bad("No data! Try again later.")); }
+		echo $q ? l(good('Done!')) : l(bad('DATABASE ERROR: ' . $db->error()));
+	} else { echo l(bad('No data! Try again later.')); }
 	
-	require "mfooter.php";
+	require 'mfooter.php';

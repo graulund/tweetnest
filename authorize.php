@@ -98,7 +98,7 @@
 			return preg_replace('/' . $directiveHead . '(\s*)' . $empty . '/', "'" . $setting . "'$1=>$2" . $val, $cf);
 		} else {
 			// If it does not exist, let's add it to the end of the literal array in the file.
-			return str_lreplace(');', ",'" . $setting . "' => " . $val . "\n);", $cf);
+			return str_lreplace(');', "'" . $setting . "' => " . $val . ",\n);", $cf);
 		}
 	}
 
@@ -122,8 +122,8 @@
 		// Time to write the config file with the information we now have.
 
 		$cf = file_get_contents('inc/config.php');
-		$cf = configSetting($cf, 'consumer_key', $_POST['consumer_key']);
-		$cf = configSetting($cf, 'consumer_secret', $_POST['consumer_secret']);
+		$cf = configSetting($cf, 'consumer_key', $_SESSION['entered_consumer_key']);
+		$cf = configSetting($cf, 'consumer_secret', $_SESSION['entered_consumer_secret']);
 		$cf = configSetting($cf, 'your_tw_screenname', $_SESSION['access_token']['screen_name']);
 		$cf = configSetting($cf, 'twitter_token', $_SESSION['access_token']['oauth_token']);
 		$cf = configSetting($cf, 'twitter_token_secr', $_SESSION['access_token']['oauth_token_secret']);
@@ -499,6 +499,11 @@ option.deselected {
 	margin-left: 1px;
 }
 
+p.intro {
+	font-size: 150%;
+	line-height: 1.6em;
+}
+
 </style>
 </head>
 <body>
@@ -512,8 +517,8 @@ option.deselected {
 
 		<h2 id="excerpt"><strong>Success!</strong> You have now authorized Tweet Nest.</h2>
 
-		<p>You can now start <a href="./maintenance/loadtweets.php">loading your newest tweets</a>.</p>
-		<p>You may also remove this file.</p>
+		<p class="intro">You can now start <a href="./maintenance/loadtweets.php">loading your newest tweets</a>.</p>
+		<p class="intro">You may also remove this file.</p>
 
 <?php
 	} else {
@@ -523,33 +528,34 @@ option.deselected {
 		<?php echo displayErrors($e); ?>
 <?php } ?>
 
-		<p><strong>Due to Twitter&#8217;s newest policies,</strong> every connection made to Twitter now has to be
+		<h2 id="excerpt"><strong>Due to Twitter&#8217;s newest policies,</strong> every connection made to Twitter now has to be
 			authenticated as coming from a source which is registered with Twitter. Because of this, to continue
-			to use Tweet Nest, you have to <strong>register your Tweet Nest installation as an app with Twitter</strong>.</p>
-		<p>If you haven&#8217;t already done so, here&#8217;s a link to Twitter&#8217;s Developer Site where you can
+			to use Tweet Nest, you have to <strong>register your Tweet Nest installation as an app with Twitter</strong>.</h2>
+		<p class="intro">If you haven&#8217;t already done so, here&#8217;s a link to Twitter&#8217;s Developer Site where you can
 			click the &#8220;Create new application&#8221; button to register (link opens in a new window):</p>
-		<p><a href="http://dev.twitter.com/apps" target="_blank">Go to Twitter&#8217;s Developer Site</a></p>
-		<p>When you do that, you get two strings in return, labeled the <em>consumer key</em> and the <em>consumer secret</em>.
+		<p><a class="proceed" href="http://dev.twitter.com/apps" target="_blank">Go to Twitter&#8217;s Developer Site</a></p>
+		<p class="intro">When you do that, you get two strings in return, labeled the <em>consumer key</em> and the <em>consumer secret</em>.
 			Paste them below:</p>
 
-
+		<form action="" method="post">
 		<div class="input">
 			<label for="consumer_key">Twitter consumer key</label>
-			<div class="field required"><input type="text" class="text" name="consumer_key" id="consumer_key" value="<?php echo s($enteredConsumerKey); ?>" /></div>
-			<div class="what">The consumer key of an app created and registered on <a href="http://dev.twitter.com/apps">dev.twitter.com</a>.</div>
+			<div class="field required"><input type="text" class="text code" name="consumer_key" id="consumer_key" value="<?php echo s($enteredConsumerKey); ?>" /></div>
+			<div class="what">The consumer key of an app created and registered on <a href="http://dev.twitter.com/apps" target="_blank">dev.twitter.com</a>.</div>
 		</div>
 		<div class="input">
 			<label for="consumer_secret">Twitter consumer secret</label>
-			<div class="field required"><input type="text" class="text" name="consumer_secret" id="consumer_secret" value="<?php echo s($enteredConsumerSecret); ?>" /></div>
+			<div class="field required"><input type="text" class="text code" name="consumer_secret" id="consumer_secret" value="<?php echo s($enteredConsumerSecret); ?>" /></div>
 			<div class="what">The consumer secret of the above.</div>
 		</div>
 
-		<h2>That&#8217;s it!</h2>
+		<h2><strong>That&#8217;s it!</strong></h2>
 
-		<p>With the provided strings above, clicking the button below will now redirect your browser to Twitter to
+		<p class="intro">With the provided strings above, clicking the button below will now redirect your browser to Twitter to
 			ask for your personal Twitter credentials, which will be used to let Tweet Nest access your tweets.</p>
 
 		<div><input type="submit" class="submit" value="Authorize" /></div>
+		</form>
 <?php } ?>
 	</div>
 </div>

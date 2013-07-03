@@ -48,7 +48,9 @@
 		if(!$twitterApi->validateUserParam($p)){ return false; }
         $p = explode('=', $p);
         $data = $twitterApi->query('users/show', array($p[0] => $p[1]));
-		if(is_array($data) && $data[0] === false){ dieout(l(bad("Error: " . $data[1] . "/" . $data[2]))); }
+		if(is_array($data) && $data[0] === false){
+			dieout(l(bad('Error: ' . $data[1] . '/' . $data[2])));
+		}
 		return $data->statuses_count;
 	}
 	
@@ -60,6 +62,12 @@
 		$tweets   = array();
 		$sinceID  = 0;
 		$maxID    = 0;
+
+		// Check for authentication
+		if(!isset($config['consumer_key']) || !isset($config['consumer_secret'])){
+			die("Consumer key and secret not found. These are required for authentication to Twitter. \n" .
+				"Please point your browser to the authorize.php file to configure these.\n");
+		}
 
         list($userparam, $uservalue) = explode('=', $p);
 		
@@ -84,10 +92,13 @@
 		
 		// Find total number of tweets
 		$total = totalTweets($p);
-		if($total > 3200){ $total = 3200; } // Due to current Twitter limitation
-		$pages = ceil($total / $maxCount);
-		
-		echo l("Total tweets: <strong>" . $total . "</strong>, Approx. page total: <strong>" . $pages . "</strong>\n");
+		if(is_numeric($total)){
+			if($total > 3200){ $total = 3200; } // Due to current Twitter limitation
+			$pages = ceil($total / $maxCount);
+
+			echo l("Total tweets: <strong>" . $total . "</strong>, Approx. page total: <strong>" . $pages . "</strong>\n");
+		}
+
 		if($sinceID){
 			echo l("Newest tweet I've got: <strong>" . $sinceID . "</strong>\n");
 		}
@@ -124,7 +135,7 @@
 				foreach($data as $i => $tweet){
 
                     // First, let's check if an API error occured
-                    if(is_array($tweet) && is_object($tweet[0]) && property_exists('message', $tweet[0])){
+                    if(is_array($tweet) && is_object($tweet[0]) && property_exists($tweet[0], 'message')){
                         dieout(l(bad('A Twitter API error occured: ' . $tweet[0]->message)));
                     }
 
@@ -200,7 +211,7 @@
 				foreach($data as $i => $tweet){
 
                     // First, let's check if an API error occured
-                    if(is_array($tweet) && is_object($tweet[0]) && property_exists('message', $tweet[0])){
+                    if(is_array($tweet) && is_object($tweet[0]) && property_exists($tweet[0], 'message')){
                         dieout(l(bad('A Twitter API error occured: ' . $tweet[0]->message)));
                     }
 

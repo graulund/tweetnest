@@ -80,7 +80,7 @@
 			return preg_replace('/' . $directiveHead . '(\s*)' . $empty . '/', "'" . $setting . "'$1=>$2" . $val, $cf);
 		} else {
 			// If it does not exist, let's add it to the end of the literal array in the file.
-			return str_lreplace(');', ",'" . $setting . "' => " . $val . "\n);", $cf);
+			return str_lreplace(');', "'" . $setting . "' => " . $val . ",\n);", $cf);
 		}
 	}
 	
@@ -144,7 +144,17 @@
 
 		$log[] = "Settings being submitted!";
 		$log[] = "PHP version: " . PHP_VERSION;
-		if(empty($e) && !empty($_POST['tz']) && !empty($_POST['path']) && !empty($_POST['db_hostname']) && !empty($_POST['db_username']) && !empty($_POST['db_database'])){ // Required fields
+		if(
+			empty($e) &&
+			// Required fields
+			!empty($_POST['tz']) &&
+			!empty($_POST['path']) &&
+			!empty($_POST['db_hostname']) &&
+			!empty($_POST['db_username']) &&
+			!empty($_POST['db_database']) &&
+			!empty($_POST['consumer_key']) &&
+			!empty($_POST['consumer_secret'])
+		){
 			$log[] = "All required fields filled in.";
 			if(date_default_timezone_set($_POST['tz'])){
 				$log[] = "Valid time zone.";
@@ -645,12 +655,12 @@ INSTALL LOG: <?php var_dump($log); ?>
 			<div id="greennotice"><span></span>Green color means the value is <strong>required</strong></div>
             <div class="input">
                 <label for="consumer_key">Twitter consumer key</label>
-                <div class="field required"><input type="text" class="text" name="consumer_key" id="consumer_key" value="<?php echo s($enteredConsumerKey); ?>" /></div>
+                <div class="field required"><input type="text" class="text code" name="consumer_key" id="consumer_key" value="<?php echo s($enteredConsumerKey); ?>" /></div>
                 <div class="what">The consumer key of an app created and registered on <a href="http://dev.twitter.com/apps">dev.twitter.com</a>.</div>
             </div>
             <div class="input">
                 <label for="consumer_secret">Twitter consumer secret</label>
-                <div class="field required"><input type="text" class="text" name="consumer_secret" id="consumer_secret" value="<?php echo s($enteredConsumerSecret); ?>" /></div>
+                <div class="field required"><input type="text" class="text code" name="consumer_secret" id="consumer_secret" value="<?php echo s($enteredConsumerSecret); ?>" /></div>
                 <div class="what">The consumer secret of the above.</div>
             </div>
 			<div class="input">
@@ -710,7 +720,7 @@ INSTALL LOG: <?php var_dump($log); ?>
 			</div>
 			<div class="input lastinput">
 				<label for="db_table_prefix">Table name prefix</label>
-				<div class="field required"><input type="text" class="text" name="db_table_prefix" id="db_table_prefix" maxlength="10" value="<?php echo !empty($_POST) ? s($_POST['db_table_prefix']) : s("tn_"); ?>" /></div>
+				<div class="field required"><input type="text" class="text code" name="db_table_prefix" id="db_table_prefix" maxlength="10" value="<?php echo !empty($_POST) ? s($_POST['db_table_prefix']) : s("tn_"); ?>" /></div>
 				<div class="what">The Tweet Archive set up page (that&#8217;s this one!) generates three different tables, and to prevent the names clashing with some already there, here you can type a character sequence prefixed to the name of both tables. Something like <strong>&#8220;ta_&#8221;</strong> or <strong>&#8220;tn_&#8221;</strong> is good.</div>
 			</div>
 			

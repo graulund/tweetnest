@@ -5,8 +5,24 @@
 	* Verify credentials and redirect to based on response from Twitter.
 	*/
 
-	// Start session and load libraries
+	// Start session
 	session_start();
+
+	// If we've defined the consumer key and secret in a session, get 'em:
+	if(
+		(
+			!isset($config) || !is_array($config) ||
+			!isset($config['consumer_key']) || !isset($config['consumer_secret'])
+		) &&
+		isset($_SESSION['entered_consumer_key']) &&
+		isset($_SESSION['entered_consumer_secret'])
+	){
+		if(!isset($config) || !$config){ $config = array(); }
+		$config['consumer_key']    = $_SESSION['entered_consumer_key'];
+		$config['consumer_secret'] = $_SESSION['entered_consumer_secret'];
+	}
+
+	// Load libraries
 	require_once 'inc/twitteroauth/twitteroauth.php';
 	require_once 'inc/twitteroauth/config.php';
 
