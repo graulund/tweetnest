@@ -27,7 +27,7 @@
 		exit;
 	}
 
-	if(!defined('CONSUMER_KEY') || !defined('CONSUMER_SECRET')){
+	if(!defined('CONSUMER_KEY') || !CONSUMER_KEY || !defined('CONSUMER_SECRET') || !CONSUMER_SECRET){
 	    die('<strong>Consumer key and/or secret were not specified.</strong> Please check your configuration file, ' .
 	        'or if you were setting up Tweet Nest, please provide these values before authenticating. ' .
 	        'You can create them at <a href="http://dev.twitter.com/apps">dev.twitter.com</a>.');

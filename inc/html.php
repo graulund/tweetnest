@@ -131,6 +131,10 @@
 		if(areEntitiesEmpty($entities)){
 			$htmlcontent = linkifyTweet($htmlcontent);
 		} else {
+			// Known issue: Entities have faulty indices when parsing a preprocessed $htmlcontent,
+			// where the preprocessing creates more characters than were there previously.
+			// For example ">" into "&gt;" and an em dash into "---".
+
 			$htmlcontent = linkifyTweet(entitifyTweet($htmlcontent, $entities), true);
 		}
 		
@@ -439,16 +443,26 @@
 		// Putting it all together
 		$out = '';
 		$lastEntityEnded = 0;
-		
+
+		// Sort the entity replacements by start index
 		ksort($replacements);
-		
+
+		// Loop through all entities
 		foreach($replacements as $position => $replacement){
+
+			// Insert the content between this entity and the previous one
 			$out .= mb_substr($str, $lastEntityEnded, $position - $lastEntityEnded);
+
+			// Insert the entity content
 			$out .= $replacement['content'];
+
+			// Update the position of the last entity end
 			$lastEntityEnded = $replacement['end'];
 		}
-		
+
+		// Insert the remaining content
 		$out .= mb_substr($str, $lastEntityEnded);
+
 		return $out;
 	}
 	
