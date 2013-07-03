@@ -520,6 +520,8 @@ p.intro {
 		<p class="intro">You can now start <a href="./maintenance/loadtweets.php">loading your newest tweets</a>.</p>
 		<p class="intro">You may also remove this file.</p>
 
+		<p><strong>Running upgrade script...</strong> <?php require 'upgrade.php'; ?></p>
+
 <?php
 	} else {
 		if($e && $post){

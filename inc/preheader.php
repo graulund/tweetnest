@@ -72,7 +72,7 @@
 	define("DB_OFFSET", $dbOffset);
 	
 	// String manipulation functions
-	function s($str, $flags = ENT_COMPAT){ return htmlspecialchars($str, $flags); } // Shorthand
+	if(!function_exists('s')){ function s($str, $flags = ENT_COMPAT){ return htmlspecialchars($str, $flags); }} // Shorthand
 	function x($str, $attr = NULL){ return p(s($str, ENT_NOQUOTES), $attr); } // Shorthand
 	function p($str, $attr = NULL, $force = false){ global $config; return ($config['smartypants'] || $force) ? SmartyPants($str, $attr) : $str; }
 	
