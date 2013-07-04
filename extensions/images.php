@@ -93,7 +93,7 @@
 		
 		public function displayTweet($d, $tweet){
 			@$tweetextra = unserialize($tweet['extra']);
-			if(array_key_exists("imgs", $tweetextra)){
+			if(is_array($tweetextra) && array_key_exists("imgs", $tweetextra)){
 				preg_match("/^([\t]+)</", $d, $m); $x = $m[1];
 				$ds    = explode("\n", $d, 2);
 				$imgd  = ""; $i = 1; $is = array();
