@@ -120,7 +120,7 @@
 		if(!empty($tweet['place'])){
 			$tweetplace = unserialize(str_replace("O:16:\"SimpleXMLElement\"", "O:8:\"stdClass\"", $tweet['place']));
 		}
-		$rt = (array_key_exists("rt", $tweetextra) && !empty($tweetextra['rt']));
+		$rt = (is_array($tweetextra) && array_key_exists("rt", $tweetextra) && !empty($tweetextra['rt']));
 		$t  = str_repeat("\t", $tabs);
 		if($rt){ $retweet = $tweetextra['rt']; }
 		
