@@ -75,6 +75,9 @@
 						if($domain == "twitvid.com"){
 							$imgs[$link] = $http . "://images.twitvid.com/" . $imgid . ".jpg";
 						}
+						if($domain == "moby.to"){
+							$imgs[$link] = $http . "://moby.to/" . $imgid . ":square";
+						}
 						if($domain == "instagr.am" || $domain == "instagram.com"){
 							$html = (string)getURL($link);
 							preg_match('/<meta property="og:image" content="([^"]+)"\s*\/>/i', $html, $matches);
