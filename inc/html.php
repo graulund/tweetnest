@@ -138,6 +138,17 @@
 			$htmlcontent = linkifyTweet(entitifyTweet($htmlcontent, $entities), true);
 		}
 		
+		$inReplyToTweetId = '';
+		
+		if($tweetextra && !empty($tweetextra['in_reply_to_status_id'])){
+			if(!empty($tweetextra['in_reply_to_status_id_str'])){
+				// Always prefer str property if possible
+				$inReplyToTweetId = $tweetextra['in_reply_to_status_id_str'];
+			} else {
+				$inReplyToTweetId = $tweetextra['in_reply_to_status_id'];
+			}
+		}
+		
 		$d  =   $t . "<div id=\"tweet-" . s($tweet['tweetid']) . "\" class=\"tweet" . (($tweet['type'] == 1) ? " reply" : "") . (($tweet['type'] == 2) ? " retweet" : "") . "\">\n" . 
 				($tweet['favorite'] ? $t . "\t<div class=\"fav\" title=\"A personal favorite\"><span>(A personal favorite)</span></div>\n" : "") .
 				$t . "\t<p class=\"text\">" . 
@@ -148,7 +159,7 @@
 				$t . "\t<p class=\"meta\">\n" . $t . "\t\t<a href=\"http://twitter.com/" . s($rt ? $retweet['screenname'] : $tweet['screenname']) . "/statuses/" . s($rt ? $retweet['tweetid'] : $tweet['tweetid']) . "\" class=\"permalink\">" . date("g:i A, M jS, Y", ($rt ? $retweet['time'] : $tweet['time'])) . "</a>\n" . 
 				$t . "\t\t<span class=\"via\">via " . ($rt ? $retweet['source'] : $tweet['source']) . "</span>\n" .
 				($rt ? $t . "\t\t<span class=\"rted\">(retweeted on " . date("g:i A, M jS, Y", $tweet['time']) . " <span class=\"via\">via " . $tweet['source'] . "</span>)</span>\n" : "") . 
-				((!$rt && $tweetextra && @!empty($tweetextra['in_reply_to_status_id'])) ? $t . "\t\t<a class=\"replyto\" href=\"http://twitter.com/" . s($tweetextra['in_reply_to_screen_name']) . "/statuses/" . s($tweetextra['in_reply_to_status_id']) . "\">in reply to " . s($tweetextra['in_reply_to_screen_name']) . "</a>\n" : "") . 
+				((!$rt && $inReplyToTweetId) ? $t . "\t\t<a class=\"replyto\" href=\"http://twitter.com/" . s($tweetextra['in_reply_to_screen_name']) . "/statuses/" . s($inReplyToTweetId) . "\">in reply to " . s($tweetextra['in_reply_to_screen_name']) . "</a>\n" : "") . 
 				(($tweetplace && @$tweetplace->full_name) ? "\t\t<span class=\"place\">from <a href=\"http://maps.google.com/?q=" . urlencode($tweetplace->full_name) . "\">" . s($tweetplace->full_name) . "</a></span>" : "") .
 				$t . "\t</p>\n" . $t . "</div>\n";
 		$dd = hook("displayTweet", array($d, $tweet));
