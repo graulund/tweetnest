@@ -398,10 +398,28 @@
 				'(?<!title=\"http:\/\/)(?<!title=\"https:\/\/)' .
 				'(?<!data-image=\")(?<!data-image=\"http:\/\/)(?<!data-image=\"https:\/\/)';
 		// Expression
-		$html = preg_replace("/$lookbehind\b(((https?:\/\/)|www\.).+?)(([!?,.\"\)]+)?(\s|$))/e", "_linkifyTweet_link('$1', '$2', '$3', '$4')", $str);
+		$html = preg_replace_callback(
+			"/$lookbehind\b(((https?:\/\/)|www\.).+?)(([!?,.\"\)]+)?(\s|$))/",
+			function ($m) {
+				return _linkifyTweet_link($m[1], $m[2], $m[3], $m[4]);
+			},
+			$str
+		);
 		if(!$linksOnly){
-			$html = preg_replace("/\B\@([a-zA-Z0-9_]{1,20}(\/\w+)?)/e", "_linkifyTweet_at('$1', '$2')", $html);
-			$html = preg_replace("/\B\#([\pL|0-9|_]+)/eu", "_linkifyTweet_hashtag('$1', '$2')", $html);
+			$html = preg_replace_callback(
+				"/\B\@([a-zA-Z0-9_]{1,20}(\/\w+)?)/",
+				function ($m) {
+					return _linkifyTweet_at($m[1], $m[2]);
+				},
+				$html
+			);
+			$html = preg_replace_callback(
+				"/\B\#([\pL|0-9|_]+)/u",
+				function ($m) {
+					return _linkifyTweet_hashtag($m[1], $m[2]);
+				},
+				$html
+			);
 		}
 		return $html;
 	}
