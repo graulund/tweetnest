@@ -122,7 +122,7 @@
 
 
         // Are we redirecting?
-        if(isset($_POST['redirect']) && !empty($_POST['redirect'])){
+        if(!empty($_POST['redirect']) || !empty($_POST['redirect_x'])){
             if(
                 isset($_POST['consumer_key']) && !empty($_POST['consumer_key']) &&
                 isset($_POST['consumer_secret']) && !empty($_POST['consumer_secret'])
