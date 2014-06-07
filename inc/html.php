@@ -380,16 +380,16 @@
 	
 	// Internal functions -------------------------------
 	
-	function _linkifyTweet_link($a, $b, $c, $d){
-		$url = stripslashes($a);
-		$end = stripslashes($d);
-		return "<a class=\"link\" href=\"" . ($b[0] == "w" ? "http://" : "") . str_replace("\"", "&quot;", $url) . "\">" . (strlen($url) > 25 ? substr($url, 0, 24) . "..." : $url) . "</a>" . $end;
+	function _linkifyTweet_link($m){
+		$url = stripslashes($m[1]);
+		$end = stripslashes($m[4]);
+		return "<a class=\"link\" href=\"" . ($m[2][0] == "w" ? "http://" : "") . str_replace("\"", "&quot;", $url) . "\">" . (strlen($url) > 25 ? substr($url, 0, 24) . "..." : $url) . "</a>" . $end;
 	}
-	function _linkifyTweet_at($a, $b){
-		return "<span class=\"at\">@</span><a class=\"user\" href=\"http://twitter.com/" . $a . "\">" . $a . "</a>";
+	function _linkifyTweet_at($m){
+		return "<span class=\"at\">@</span><a class=\"user\" href=\"http://twitter.com/" . $m[1] . "\">" . $m[1] . "</a>";
 	}
-	function _linkifyTweet_hashtag($a, $b){
-		return "<a class=\"hashtag\" href=\"http://twitter.com/search?q=%23" . $a . "\">#" . $a . "</a>";
+	function _linkifyTweet_hashtag($m){
+		return "<a class=\"hashtag\" href=\"http://twitter.com/search?q=%23" . $m[1] . "\">#" . $m[1] . "</a>";
 	}
 	function linkifyTweet($str, $linksOnly = false){
 		// Look behind (it kinda sucks, no | operator)
@@ -400,24 +400,18 @@
 		// Expression
 		$html = preg_replace_callback(
 			"/$lookbehind\b(((https?:\/\/)|www\.).+?)(([!?,.\"\)]+)?(\s|$))/",
-			function ($m) {
-				return _linkifyTweet_link($m[1], $m[2], $m[3], $m[4]);
-			},
+			'_linkifyTweet_link',
 			$str
 		);
 		if(!$linksOnly){
 			$html = preg_replace_callback(
 				"/\B\@([a-zA-Z0-9_]{1,20}(\/\w+)?)/",
-				function ($m) {
-					return _linkifyTweet_at($m[1], $m[2]);
-				},
+				'_linkifyTweet_at',
 				$html
 			);
 			$html = preg_replace_callback(
 				"/\B\#([\pL|0-9|_]+)/u",
-				function ($m) {
-					return _linkifyTweet_hashtag($m[1], $m[2]);
-				},
+				'_linkifyTweet_hashtag',
 				$html
 			);
 		}
