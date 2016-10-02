@@ -95,15 +95,19 @@
 		}
 		
 		public function displayTweet($d, $tweet){
+			global $config;
+			$https_strict = $config['https_strict'];
 			@$tweetextra = unserialize($tweet['extra']);
 			if(is_array($tweetextra) && array_key_exists("imgs", $tweetextra)){
 				preg_match("/^([\t]+)</", $d, $m); $x = $m[1];
 				$ds    = explode("\n", $d, 2);
 				$imgd  = ""; $i = 1; $is = array();
 				foreach($tweetextra['imgs'] as $link => $img){
-					$imgd .= 
-						$x . "\t<a class=\"pic pic-" . s($i) . "\" href=\"" . s($link) . "\">" .
-						"<img src=\"" . s($img) . "\" alt=\"\" /></a>\n";
+					if(!$https_strict || substr(s($img), 0, 2) == "//" || substr(s($img), 0, 8) == "https://") {
+						$imgd .=
+							$x . "\t<a class=\"pic pic-" . s($i) . "\" href=\"" . s($link) . "\">" .
+							"<img src=\"" . s($img) . "\" alt=\"\" /></a>\n";
+					}
 					$is[$link] = $i++;
 				}
 				foreach($is as $link => $i){

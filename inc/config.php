@@ -32,6 +32,7 @@
 		
 		'follow_me_button'   => true, // Display 'follow me' button?
 		'smartypants'        => true, // Use SmartyPants to perfect punctuation inside tweets?
+		'https_strict'       => false, // Disable inline images for HTTP-only image hosters?
 		
 		'css' => 'styles/streamlined/styles.css.php', // What CSS file should we use?
 		

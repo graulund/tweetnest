@@ -252,6 +252,7 @@
 							$cf = configSetting($cf, "maintenance_http_password", $_POST['maintenance_http_password']);
 							$cf = configSetting($cf, "follow_me_button", !empty($_POST['follow_me_button']));
 							$cf = configSetting($cf, "smartypants", !empty($_POST['smartypants']));
+							$cf = configSetting($cf, "https_strict", !empty($_POST['https_strict']));
 							$f  = fopen("inc/config.php", "wt");
 							$fe = "Could not write configuration to <code>config.php</code>, please make sure that it is writable! Often, this is done through giving every system user the write privileges on that file through FTP.";
 							if($f){
@@ -740,10 +741,15 @@ INSTALL LOG: <?php var_dump($log); ?>
 				<div class="field"><input type="checkbox" class="checkbox" name="follow_me_button" id="follow_me_button" checked="checked" /></div>
 				<div class="what">Display a &#8220;Follow me on Twitter&#8221; button on your Tweet Nest page?</div>
 			</div>
-			<div class="input lastinput">
+			<div class="input">
 				<label for="smartypants">SmartyPants</label>
 				<div class="field"><input type="checkbox" class="checkbox" name="smartypants" id="smartypants" checked="checked" /></div>
 				<div class="what">Use <a href="http://daringfireball.net/projects/smartypants/" target="_blank">SmartyPants</a> to perfect punctuation inside tweets? Changes all "straight quotes" to &#8220;curly quotes&#8221; and more.</div>
+			</div>
+			<div class="input lastinput">
+				<label for="https_strict">HTTPS Strict</label>
+				<div class="field"><input type="checkbox" class="checkbox" name="https_strict" id="https_strict" checked="checked" /></div>
+				<div class="what">Enforce to only show inline images (&#8220;thumbnails&#8221;) when they come from HTTPS urls. If you are concerned about <a href="https://developers.google.com/web/fundamentals/security/prevent-mixed-content/what-is-mixed-content" target="_blank">mixed content</a> (or just want to prevent the warnings from modern browsers), you should check this.</div>
 			</div>
 			
 			<h2>Style settings</h2>
