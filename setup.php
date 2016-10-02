@@ -138,7 +138,7 @@
                 exit;
             } else {
                 $e[] = 'Please fill in your <strong>Twitter app consumer key and secret</strong> before authenticating with Twitter. ' .
-                    'You can get these by creating an app at <a href="http://dev.twitter.com/apps">dev.twitter.com</a>.';
+                    'You can get these by creating an app at <a href="//dev.twitter.com/apps">dev.twitter.com</a>.';
             }
         }
 
@@ -656,7 +656,7 @@ INSTALL LOG: <?php var_dump($log); ?>
             <div class="input">
                 <label for="consumer_key">Twitter consumer key</label>
                 <div class="field required"><input type="text" class="text code" name="consumer_key" id="consumer_key" value="<?php echo s($enteredConsumerKey); ?>" /></div>
-                <div class="what">The consumer key of an app created and registered on <a href="http://dev.twitter.com/apps">dev.twitter.com</a>.</div>
+                <div class="what">The consumer key of an app created and registered on <a href="//dev.twitter.com/apps">dev.twitter.com</a>.</div>
             </div>
             <div class="input">
                 <label for="consumer_secret">Twitter consumer secret</label>

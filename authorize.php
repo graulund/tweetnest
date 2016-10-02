@@ -535,7 +535,7 @@ p.intro {
 			to use Tweet Nest, you have to <strong>register your Tweet Nest installation as an app with Twitter</strong>.</h2>
 		<p class="intro">If you haven&#8217;t already done so, here&#8217;s a link to Twitter&#8217;s Developer Site where you can
 			click the &#8220;Create new application&#8221; button to register (link opens in a new window):</p>
-		<p><a class="proceed" href="http://dev.twitter.com/apps" target="_blank">Go to Twitter&#8217;s Developer Site</a></p>
+		<p><a class="proceed" href="//dev.twitter.com/apps" target="_blank">Go to Twitter&#8217;s Developer Site</a></p>
 		<p class="intro">When you do that, you get two strings in return, labeled the <em>consumer key</em> and the <em>consumer secret</em>.
 			Paste them below:</p>
 
@@ -543,7 +543,7 @@ p.intro {
 		<div class="input">
 			<label for="consumer_key">Twitter consumer key</label>
 			<div class="field required"><input type="text" class="text code" name="consumer_key" id="consumer_key" value="<?php echo s($enteredConsumerKey); ?>" /></div>
-			<div class="what">The consumer key of an app created and registered on <a href="http://dev.twitter.com/apps" target="_blank">dev.twitter.com</a>.</div>
+			<div class="what">The consumer key of an app created and registered on <a href="//dev.twitter.com/apps" target="_blank">dev.twitter.com</a>.</div>
 		</div>
 		<div class="input">
 			<label for="consumer_secret">Twitter consumer secret</label>

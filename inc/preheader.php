@@ -121,17 +121,17 @@
 			return $a;
 		}
 	}
-	
+
 	function findURLs($str){
 		$urls = array();
 		preg_match_all("/\b(((https*:\/\/)|www\.).+?)(([!?,.\"\)]+)?(\s|$))/", $str, $m);
 		foreach($m[1] as $url){
-			$u = ($url[0] == "w") ? "http://" . $url : $url;
+			$u = ($url[0] == "w") ? "//" . $url : $url;
 			$urls[$u] = parse_url($u);
 		}
 		return $urls;
 	}
-	
+
 	function domain($host){
 		if(empty($host) || !is_string($host)){ return false; }
 		if(preg_match("/^[0-9\.]+$/", $host)){ return $host; } // IP

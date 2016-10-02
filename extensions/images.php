@@ -48,10 +48,10 @@
 					if($imgid){
 						if($domain == "twimg.com"){
 							$displaylink = $linkmap ? $linkmap[$link] : $link;
-							$imgs[$displaylink] = $http . "://pbs.twimg.com" . $l['path'] . ":thumb";
+							$imgs[$displaylink] = "//pbs.twimg.com" . $l['path'] . ":thumb";
 						}
 						if($domain == "twitpic.com"){
-							$imgs[$link] = $http . "://twitpic.com/show/thumb/" . $imgid;
+							$imgs[$link] = "//twitpic.com/show/thumb/" . $imgid;
 						}
 						if($domain == "yfrog.com" || $domain == "yfrog.us"){
 							$imgs[$link] = $http . "://yfrog.com/" . $imgid . ".th.jpg";
@@ -70,7 +70,7 @@
 							$imgs[$link] = $http . "://pict.mobi/show/thumb/" . $imgid;
 						}
 						if($domain == "imgur.com"){
-							$imgs[$link] = $http . "://i.imgur.com/" . $imgid . "s.jpg";
+							$imgs[$link] = "//i.imgur.com/" . $imgid . "s.jpg";
 						}
 						if($domain == "twitvid.com"){
 							$imgs[$link] = $http . "://images.twitvid.com/" . $imgid . ".jpg";

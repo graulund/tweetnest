@@ -23,12 +23,12 @@
 	<div id="container">
 		<div id="top">
 			<div id="author">
-				<h2><a href="http://twitter.com/<?php echo s($config['twitter_screenname']); ?>"><strong><?php echo s($author['realname']); ?></strong> (@<?php echo s($config['twitter_screenname']); ?>)<img src="<?php echo s($author['profileimage']); ?>" width="48" height="48" alt="" /></a></h2>
+				<h2><a href="//twitter.com/<?php echo s($config['twitter_screenname']); ?>"><strong><?php echo s($author['realname']); ?></strong> (@<?php echo s($config['twitter_screenname']); ?>)<img src="<?php echo s($author['profileimage']); ?>" width="48" height="48" alt="" /></a></h2>
 				<p><?php echo s($author['location']); ?></p>
 			</div>
 			<div id="info">
 				<p>The below is an off-site archive of <strong><a href="<?php echo $path; ?>/">all tweets posted by @<?php echo s($config['twitter_screenname']); ?></a></strong> ever</p>
-<?php if($config['follow_me_button']){ ?>				<p class="follow"><a href="http://twitter.com/<?php echo s($config['twitter_screenname']); ?>">Follow me on Twitter</a></p><?php echo "\n"; } ?>
+<?php if($config['follow_me_button']){ ?>				<p class="follow"><a href="//twitter.com/<?php echo s($config['twitter_screenname']); ?>">Follow me on Twitter</a></p><?php echo "\n"; } ?>
 			</div>
 		</div>
 		<div id="content">
