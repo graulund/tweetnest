@@ -53,27 +53,8 @@
 						if($domain == "twitpic.com"){
 							$imgs[$link] = "//twitpic.com/show/thumb/" . $imgid;
 						}
-						if($domain == "yfrog.com" || $domain == "yfrog.us"){
-							$imgs[$link] = $http . "://yfrog.com/" . $imgid . ".th.jpg";
-						}
-						if($domain == "tweetphoto.com" || $domain == "pic.gd" || $domain == "plixi.com"){
-							$imgs[$link] = $http . "://tweetphotoapi.com/api/TPAPI.svc/imagefromurl?size=thumbnail&url=" . $link;
-						}
-						if($domain == "twitgoo.com"){
-							$values = simplexml_load_string(getURL($http . "://twitgoo.com/api/message/info/" . $imgid));
-							$imgs[$link] = (string)$values->thumburl;
-						}
-						if($domain == "img.ly"){
-							$imgs[$link] = $http . "://img.ly/show/thumb/" . $imgid;
-						}
-						if($domain == "pict.mobi"){
-							$imgs[$link] = $http . "://pict.mobi/show/thumb/" . $imgid;
-						}
 						if($domain == "imgur.com"){
 							$imgs[$link] = "//i.imgur.com/" . $imgid . "s.jpg";
-						}
-						if($domain == "twitvid.com"){
-							$imgs[$link] = $http . "://images.twitvid.com/" . $imgid . ".jpg";
 						}
 						if($domain == "moby.to"){
 							$imgs[$link] = $http . "://moby.to/" . $imgid . ":square";
