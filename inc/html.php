@@ -383,13 +383,13 @@
 	function _linkifyTweet_link($m){
 		$url = stripslashes($m[1]);
 		$end = stripslashes($m[4]);
-		return "<a class=\"link\" href=\"" . ($m[2][0] == "w" ? "http://" : "") . str_replace("\"", "&quot;", $url) . "\">" . (strlen($url) > 25 ? substr($url, 0, 24) . "..." : $url) . "</a>" . $end;
+		return "<a class=\"link\" href=\"" . ($m[2][0] == "w" ? "//" : "") . str_replace("\"", "&quot;", $url) . "\">" . (strlen($url) > 25 ? substr($url, 0, 24) . "..." : $url) . "</a>" . $end;
 	}
 	function _linkifyTweet_at($m){
-		return "<span class=\"at\">@</span><a class=\"user\" href=\"http://twitter.com/" . $m[1] . "\">" . $m[1] . "</a>";
+		return "<span class=\"at\">@</span><a class=\"user\" href=\"//twitter.com/" . $m[1] . "\">" . $m[1] . "</a>";
 	}
 	function _linkifyTweet_hashtag($m){
-		return "<a class=\"hashtag\" href=\"http://twitter.com/search?q=%23" . $m[1] . "\">#" . $m[1] . "</a>";
+		return "<a class=\"hashtag\" href=\"//twitter.com/search?q=%23" . $m[1] . "\">#" . $m[1] . "</a>";
 	}
 	function linkifyTweet($str, $linksOnly = false){
 		// Look behind (it kinda sucks, no | operator)
@@ -427,7 +427,7 @@
 		foreach($entities->user_mentions as $entity){
 			$replacements[$entity->indices[0]] = array(
 				'end'     => $entity->indices[1],
-				'content' => '<span class="at">@</span><a class="user"' . $tb . ' href="http://twitter.com/' . s($entity->screen_name) . '">' . s($entity->screen_name) . '</a>'
+				'content' => '<span class="at">@</span><a class="user"' . $tb . ' href="//twitter.com/' . s($entity->screen_name) . '">' . s($entity->screen_name) . '</a>'
 			);
 		}
 		
@@ -435,7 +435,7 @@
 		foreach($entities->hashtags as $entity){
 			$replacements[$entity->indices[0]] = array(
 				'end'     => $entity->indices[1],
-				'content' => '<a class="hashtag" rel="search"' . $tb . ' href="http://twitter.com/search?q=%23' . urlencode($entity->text) . '">#' . s($entity->text) . '</a>'
+				'content' => '<a class="hashtag" rel="search"' . $tb . ' href="//twitter.com/search?q=%23' . urlencode($entity->text) . '">#' . s($entity->text) . '</a>'
 			);
 		}
 		
