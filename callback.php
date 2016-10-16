@@ -46,7 +46,7 @@
 	if(!defined('CONSUMER_KEY') || !CONSUMER_KEY || !defined('CONSUMER_SECRET') || !CONSUMER_SECRET){
 	    die('<strong>Consumer key and/or secret were not specified.</strong> Please check your configuration file, ' .
 	        'or if you were setting up Tweet Nest, please provide these values before authenticating. ' .
-	        'You can create them at <a href="http://dev.twitter.com/apps">dev.twitter.com</a>.');
+	        'You can create them at <a href="//dev.twitter.com/apps">dev.twitter.com</a>.');
 	}
 
 	// Create TwitterOAuth object with app key/secret and token key/secret from default phase

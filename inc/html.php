@@ -151,16 +151,16 @@
 		
 		$d  =   $t . "<div id=\"tweet-" . s($tweet['tweetid']) . "\" class=\"tweet" . (($tweet['type'] == 1) ? " reply" : "") . (($tweet['type'] == 2) ? " retweet" : "") . "\">\n" . 
 				($tweet['favorite'] ? $t . "\t<div class=\"fav\" title=\"A personal favorite\"><span>(A personal favorite)</span></div>\n" : "") .
-				$t . "\t<p class=\"text\">" . 
-				($rt ? "<a class=\"rt\" href=\"http://twitter.com/" . $retweet['screenname'] . "\"><strong>" . $retweet['screenname'] . "</strong></a> " : "") . 
-				
-				nl2br(p(highlightQuery($htmlcontent, $tweet), 3)) . "</p>\n" . 
-				
-				$t . "\t<p class=\"meta\">\n" . $t . "\t\t<a href=\"http://twitter.com/" . s($rt ? $retweet['screenname'] : $tweet['screenname']) . "/statuses/" . s($rt ? $retweet['tweetid'] : $tweet['tweetid']) . "\" class=\"permalink\">" . date("g:i A, M jS, Y", ($rt ? $retweet['time'] : $tweet['time'])) . "</a>\n" . 
+				$t . "\t<p class=\"text\">" .
+				($rt ? "<a class=\"rt\" href=\"//twitter.com/" . $retweet['screenname'] . "\"><strong>" . $retweet['screenname'] . "</strong></a> " : "") .
+
+				nl2br(p(highlightQuery($htmlcontent, $tweet), 3)) . "</p>\n" .
+
+				$t . "\t<p class=\"meta\">\n" . $t . "\t\t<a href=\"//twitter.com/" . s($rt ? $retweet['screenname'] : $tweet['screenname']) . "/statuses/" . s($rt ? $retweet['tweetid'] : $tweet['tweetid']) . "\" class=\"permalink\">" . date("g:i A, M jS, Y", ($rt ? $retweet['time'] : $tweet['time'])) . "</a>\n" .
 				$t . "\t\t<span class=\"via\">via " . ($rt ? $retweet['source'] : $tweet['source']) . "</span>\n" .
-				($rt ? $t . "\t\t<span class=\"rted\">(retweeted on " . date("g:i A, M jS, Y", $tweet['time']) . " <span class=\"via\">via " . $tweet['source'] . "</span>)</span>\n" : "") . 
-				((!$rt && $inReplyToTweetId) ? $t . "\t\t<a class=\"replyto\" href=\"http://twitter.com/" . s($tweetextra['in_reply_to_screen_name']) . "/statuses/" . s($inReplyToTweetId) . "\">in reply to " . s($tweetextra['in_reply_to_screen_name']) . "</a>\n" : "") . 
-				(($tweetplace && @$tweetplace->full_name) ? "\t\t<span class=\"place\">from <a href=\"http://maps.google.com/?q=" . urlencode($tweetplace->full_name) . "\">" . s($tweetplace->full_name) . "</a></span>" : "") .
+				($rt ? $t . "\t\t<span class=\"rted\">(retweeted on " . date("g:i A, M jS, Y", $tweet['time']) . " <span class=\"via\">via " . $tweet['source'] . "</span>)</span>\n" : "") .
+				((!$rt && $inReplyToTweetId) ? $t . "\t\t<a class=\"replyto\" href=\"//twitter.com/" . s($tweetextra['in_reply_to_screen_name']) . "/statuses/" . s($inReplyToTweetId) . "\">in reply to " . s($tweetextra['in_reply_to_screen_name']) . "</a>\n" : "") .
+				(($tweetplace && @$tweetplace->full_name) ? "\t\t<span class=\"place\">from <a href=\"//maps.google.com/?q=" . urlencode($tweetplace->full_name) . "\">" . s($tweetplace->full_name) . "</a></span>" : "") .
 				$t . "\t</p>\n" . $t . "</div>\n";
 		$dd = hook("displayTweet", array($d, $tweet));
 		if(!empty($dd)){ $d = $dd[0]; }
@@ -383,13 +383,13 @@
 	function _linkifyTweet_link($m){
 		$url = stripslashes($m[1]);
 		$end = stripslashes($m[4]);
-		return "<a class=\"link\" href=\"" . ($m[2][0] == "w" ? "http://" : "") . str_replace("\"", "&quot;", $url) . "\">" . (strlen($url) > 25 ? substr($url, 0, 24) . "..." : $url) . "</a>" . $end;
+		return "<a class=\"link\" href=\"" . ($m[2][0] == "w" ? "//" : "") . str_replace("\"", "&quot;", $url) . "\">" . (strlen($url) > 25 ? substr($url, 0, 24) . "..." : $url) . "</a>" . $end;
 	}
 	function _linkifyTweet_at($m){
-		return "<span class=\"at\">@</span><a class=\"user\" href=\"http://twitter.com/" . $m[1] . "\">" . $m[1] . "</a>";
+		return "<span class=\"at\">@</span><a class=\"user\" href=\"//twitter.com/" . $m[1] . "\">" . $m[1] . "</a>";
 	}
 	function _linkifyTweet_hashtag($m){
-		return "<a class=\"hashtag\" href=\"http://twitter.com/search?q=%23" . $m[1] . "\">#" . $m[1] . "</a>";
+		return "<a class=\"hashtag\" href=\"//twitter.com/search?q=%23" . $m[1] . "\">#" . $m[1] . "</a>";
 	}
 	function linkifyTweet($str, $linksOnly = false){
 		// Look behind (it kinda sucks, no | operator)
@@ -427,7 +427,7 @@
 		foreach($entities->user_mentions as $entity){
 			$replacements[$entity->indices[0]] = array(
 				'end'     => $entity->indices[1],
-				'content' => '<span class="at">@</span><a class="user"' . $tb . ' href="http://twitter.com/' . s($entity->screen_name) . '">' . s($entity->screen_name) . '</a>'
+				'content' => '<span class="at">@</span><a class="user"' . $tb . ' href="//twitter.com/' . s($entity->screen_name) . '">' . s($entity->screen_name) . '</a>'
 			);
 		}
 		
@@ -435,7 +435,7 @@
 		foreach($entities->hashtags as $entity){
 			$replacements[$entity->indices[0]] = array(
 				'end'     => $entity->indices[1],
-				'content' => '<a class="hashtag" rel="search"' . $tb . ' href="http://twitter.com/search?q=%23' . urlencode($entity->text) . '">#' . s($entity->text) . '</a>'
+				'content' => '<a class="hashtag" rel="search"' . $tb . ' href="//twitter.com/search?q=%23' . urlencode($entity->text) . '">#' . s($entity->text) . '</a>'
 			);
 		}
 		
@@ -456,7 +456,7 @@
 				$truncated = (!empty($entity->display_url) && mb_substr($entity->display_url, -1) == '…');
 				$replacements[$entity->indices[0]] = array(
 					'end'     => $entity->indices[1],
-					'content' => '<a class="media" href="' . s($entity->url) . '"' . $tb . ' data-image="' . s($entity->media_url) . '"' . 
+					'content' => '<a class="media" href="' . s($entity->url) . '"' . $tb . ' data-image="' . s($entity->media_url_https) . '"' . 
 								(!empty($entity->expanded_url) && $truncated ? ' title="' . s($entity->expanded_url) . '"' : '') . '>' . 
 								(!empty($entity->display_url) ? $entity->display_url : $entity->url) . '</a>'
 				);

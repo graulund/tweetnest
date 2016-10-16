@@ -48,32 +48,13 @@
 					if($imgid){
 						if($domain == "twimg.com"){
 							$displaylink = $linkmap ? $linkmap[$link] : $link;
-							$imgs[$displaylink] = $http . "://pbs.twimg.com" . $l['path'] . ":thumb";
+							$imgs[$displaylink] = "//pbs.twimg.com" . $l['path'] . ":thumb";
 						}
 						if($domain == "twitpic.com"){
-							$imgs[$link] = $http . "://twitpic.com/show/thumb/" . $imgid;
-						}
-						if($domain == "yfrog.com" || $domain == "yfrog.us"){
-							$imgs[$link] = $http . "://yfrog.com/" . $imgid . ".th.jpg";
-						}
-						if($domain == "tweetphoto.com" || $domain == "pic.gd" || $domain == "plixi.com"){
-							$imgs[$link] = $http . "://tweetphotoapi.com/api/TPAPI.svc/imagefromurl?size=thumbnail&url=" . $link;
-						}
-						if($domain == "twitgoo.com"){
-							$values = simplexml_load_string(getURL($http . "://twitgoo.com/api/message/info/" . $imgid));
-							$imgs[$link] = (string)$values->thumburl;
-						}
-						if($domain == "img.ly"){
-							$imgs[$link] = $http . "://img.ly/show/thumb/" . $imgid;
-						}
-						if($domain == "pict.mobi"){
-							$imgs[$link] = $http . "://pict.mobi/show/thumb/" . $imgid;
+							$imgs[$link] = "//twitpic.com/show/thumb/" . $imgid;
 						}
 						if($domain == "imgur.com"){
-							$imgs[$link] = $http . "://i.imgur.com/" . $imgid . "s.jpg";
-						}
-						if($domain == "twitvid.com"){
-							$imgs[$link] = $http . "://images.twitvid.com/" . $imgid . ".jpg";
+							$imgs[$link] = "//i.imgur.com/" . $imgid . "s.jpg";
 						}
 						if($domain == "moby.to"){
 							$imgs[$link] = $http . "://moby.to/" . $imgid . ":square";
@@ -95,15 +76,19 @@
 		}
 		
 		public function displayTweet($d, $tweet){
+			global $config;
+			$https_strict = $config['https_strict'];
 			@$tweetextra = unserialize($tweet['extra']);
 			if(is_array($tweetextra) && array_key_exists("imgs", $tweetextra)){
 				preg_match("/^([\t]+)</", $d, $m); $x = $m[1];
 				$ds    = explode("\n", $d, 2);
 				$imgd  = ""; $i = 1; $is = array();
 				foreach($tweetextra['imgs'] as $link => $img){
-					$imgd .= 
-						$x . "\t<a class=\"pic pic-" . s($i) . "\" href=\"" . s($link) . "\">" .
-						"<img src=\"" . s($img) . "\" alt=\"\" /></a>\n";
+					if(!$https_strict || substr(s($img), 0, 2) == "//" || substr(s($img), 0, 8) == "https://") {
+						$imgd .=
+							$x . "\t<a class=\"pic pic-" . s($i) . "\" href=\"" . s($link) . "\">" .
+							"<img src=\"" . s($img) . "\" alt=\"\" /></a>\n";
+					}
 					$is[$link] = $i++;
 				}
 				foreach($is as $link => $i){
